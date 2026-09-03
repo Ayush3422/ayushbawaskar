@@ -26,7 +26,7 @@ export function DiveComputer() {
       data-testid="dive-computer"
       data-warning={String(warning)}
       aria-hidden="true"
-      className="fixed right-4 bottom-4 z-40 rounded-lg border border-border bg-card/85 p-3 font-mono backdrop-blur md:right-6 md:bottom-6 md:p-4"
+      className="fixed right-4 bottom-4 z-40 w-[11.5rem] rounded-lg border border-border bg-card/85 p-3 font-mono backdrop-blur transition-opacity duration-200 hover:opacity-15 md:right-6 md:bottom-6 md:p-4"
     >
       <div className="flex items-baseline gap-2">
         <span
