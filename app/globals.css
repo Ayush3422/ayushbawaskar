@@ -94,6 +94,17 @@
   --snow-density: 0;
   --surface-scrim: 1;
   --hadal-presence: 0;
+  --lamp-strength: 0.25;
+
+  /*
+   * Pressure, 0 at the surface to 1 at the trench floor. The interface is
+   * compressed by it: tracking tightens, panels close up, the survey grid
+   * contracts. The page is under pressure, not just describing it.
+   */
+  --pressure: 0;
+  --press-track: calc(0.22em - var(--pressure) * 0.09em);
+  --press-pad: calc(1.25rem - var(--pressure) * 0.35rem);
+  --press-grid: calc(96px - var(--pressure) * 34px);
 
   --chart-1: #d4d4d4;
   --chart-2: #a1a1a1;
@@ -143,7 +154,7 @@
     background-image:
       linear-gradient(to right, rgba(250, 250, 250, 0.028) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(250, 250, 250, 0.028) 1px, transparent 1px);
-    background-size: 96px 96px;
+    background-size: var(--press-grid) var(--press-grid);
   }
 
   a:focus-visible,

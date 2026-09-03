@@ -52,6 +52,7 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
   const pushedDepth = useRef(-1);
   const pushedRate = useRef(Number.NaN);
   const pushedSecond = useRef(-1);
+  const pushedPressure = useRef(-1);
 
   useEffect(() => {
     startedAt.current = performance.now();
@@ -131,6 +132,25 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
         "--hadal-presence",
         Math.min(1, Math.max(0, (depth - 4000) / 3000)).toFixed(4),
       );
+
+      // The lamp earns its keep with depth; near the surface there is plenty
+      // of light without it.
+      root.setProperty(
+        "--lamp-strength",
+        (0.25 + 0.75 * Math.min(depth / 3000, 1)).toFixed(3),
+      );
+
+      /*
+       * Pressure, quantised to twentieths. It drives letter-spacing and
+       * padding, which force layout — writing a fresh value every frame would
+       * relayout the whole document sixty times a second. Twenty steps across
+       * the whole descent is invisible as a jump and nearly free.
+       */
+      const pressure = Math.round((depth / MAX_DEPTH) * 20) / 20;
+      if (pressure !== pushedPressure.current) {
+        pushedPressure.current = pressure;
+        root.setProperty("--pressure", pressure.toFixed(2));
+      }
 
       // React state, by contrast, re-renders every consumer. Commit only when a
       // value someone actually displays has changed: whole metres of depth,

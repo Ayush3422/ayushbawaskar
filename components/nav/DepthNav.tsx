@@ -2,6 +2,7 @@
 
 import { MAX_DEPTH, ZONES } from "@/lib/depth";
 import { useDepth } from "@/components/depth/DepthProvider";
+import { Ambience } from "@/components/audio/Ambience";
 
 export function DepthNav() {
   const { zone, depth } = useDepth();
@@ -58,8 +59,13 @@ export function DepthNav() {
           })}
         </ul>
 
+        <div className="hidden lg:block">
+          <Ambience />
+        </div>
+
         {/* Below lg the zone list is replaced by where you currently are. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:hidden">
+          <Ambience />
           <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
             {zone.label}
           </span>

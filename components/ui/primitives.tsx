@@ -13,7 +13,8 @@ export function Label({
 }) {
   return (
     <span
-      className={`font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase ${className}`}
+      className={`font-mono text-[10px] text-muted-foreground uppercase ${className}`}
+      style={{ letterSpacing: "var(--press-track)" }}
     >
       {children}
     </span>
@@ -109,9 +110,10 @@ export function Panel({
 }) {
   return (
     <section
-      className={`relative border-2 border-border bg-card/55 p-5 ${
+      className={`relative border-2 border-border bg-card/55 ${
         signal ? "hard-shadow-signal" : "hard-shadow"
       } ${ticks ? "corner-ticks" : ""} ${className}`}
+      style={{ padding: "var(--press-pad)" }}
     >
       <header className="mb-4 flex items-center gap-3">
         <Stamp signal={signal}>{label}</Stamp>

@@ -11,10 +11,14 @@ test("HUD depth increases as the page is scrolled", async ({ page }) => {
   await page.goto("/");
   const readout = page.getByTestId("hud-depth");
   const before = await readout.textContent();
+
   await page.mouse.wheel(0, 4000);
-  await page.waitForTimeout(500);
-  const after = await readout.textContent();
-  expect(after).not.toBe(before);
+
+  // Polled rather than slept on. Smooth scrolling plus a rAF-driven readout
+  // means a fixed wait races the animation, which made this flaky.
+  await expect
+    .poll(async () => readout.textContent(), { timeout: 5000 })
+    .not.toBe(before);
 });
 
 test("the HUD never sits on top of page content", async ({ page }) => {
