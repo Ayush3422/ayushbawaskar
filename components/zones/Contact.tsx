@@ -1,5 +1,6 @@
 import { profile, colophon } from "@/data/profile";
 import { Label, Panel, PixelRule, SpecSheet, Stamp } from "@/components/ui/primitives";
+import { DiveProfile } from "./DiveProfile";
 
 export function Contact() {
   return (
@@ -145,7 +146,9 @@ export function Contact() {
       </div>
 
       <div className="border-t-2 border-border pt-10">
-        <div className="flex flex-wrap items-end justify-between gap-8">
+        <DiveProfile />
+
+        <div className="mt-10 grid gap-8 border-t-2 border-border pt-8 lg:grid-cols-[1fr_auto_auto] lg:items-end">
           <div>
             <p className="font-display text-3xl tracking-[0.22em] md:text-4xl">
               AYUSH<span style={{ color: "var(--signal)" }}>{" // "}</span>ABYSS
@@ -154,6 +157,24 @@ export function Contact() {
               11,034 m · Challenger Deep · you have reached the bottom
             </p>
           </div>
+
+          {/* The links repeat here because the reader has finished and this is
+              where they decide whether to act. */}
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {profile.links.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  target={l.href.startsWith("http") ? "_blank" : undefined}
+                  rel={l.href.startsWith("http") ? "noreferrer" : undefined}
+                  className="font-mono text-[10px] tracking-[0.2em] uppercase underline underline-offset-4 transition-colors hover:text-foreground"
+                  style={{ color: "var(--signal)" }}
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
 
           <a
             href="#surface"
