@@ -16,13 +16,32 @@ test("every contact is a real button, deepest first", async ({ page }) => {
   ]);
 });
 
-test("a contact opens its sheet from the keyboard", async ({ page }) => {
+test("a contact turns over from the keyboard and shows its evaluation", async ({
+  page,
+}) => {
   await page.goto("/");
-  const first = page.locator('[data-contact="nostro"]');
-  await first.focus();
+  const front = page.locator('[data-contact="nostro"]');
+  await front.focus();
+  await expect(front).toHaveAttribute("aria-expanded", "false");
+
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("dialog")).toContainText("0.9937");
+
+  await expect(front).toHaveAttribute("aria-expanded", "true");
+  const back = page.locator('[data-back="nostro"]');
+  await expect(back).toContainText("0.9937");
+  // The back carries the held-out/in-sample contrast the front has no room for.
+  await expect(back).toContainText("in-sample");
+});
+
+test("the turned-over face is hidden from assistive technology until it faces the reader", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const back = page.locator('[data-back="nostro"]');
+  await expect(back).toHaveAttribute("aria-hidden", "true");
+
+  await page.locator('[data-contact="nostro"]').click();
+  await expect(back).toHaveAttribute("aria-hidden", "false");
 });
 
 test("contact names carry domain and depth", async ({ page }) => {
@@ -32,10 +51,29 @@ test("contact names carry domain and depth", async ({ page }) => {
   );
 });
 
-test("the caveat is shown, not buried", async ({ page }) => {
+test("the caveat is shown on the card, not buried", async ({ page }) => {
   await page.goto("/");
   await page.locator('[data-contact="quantumchat"]').click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText(/simulated/i);
+  const back = page.locator('[data-back="quantumchat"]');
+  await expect(back).toContainText(/simulated/i);
+  await expect(back).toContainText(/what this does not claim/i);
+});
+
+test("turning one card over turns the previous one back", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('[data-contact="nostro"]').click();
+  await expect(page.locator('[data-contact="nostro"]')).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+
+  await page.locator('[data-contact="vortifi"]').click();
+  await expect(page.locator('[data-contact="nostro"]')).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
+  await expect(page.locator('[data-contact="vortifi"]')).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
 });

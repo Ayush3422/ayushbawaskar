@@ -2,17 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { projects } from "@/data/projects";
-import type { Project } from "@/data/types";
 import { SonarScope } from "@/components/sonar/SonarScope";
 import { ContactCard } from "@/components/sonar/ContactCard";
-import { ContactSheet } from "@/components/sonar/ContactSheet";
 import { Label, Panel } from "@/components/ui/primitives";
 
 /** The broad bearing a project sits on, used for the filter bar. */
 const sector = (domain: string) => domain.split(" / ")[0];
 
 export function Work() {
-  const [active, setActive] = useState<Project | null>(null);
+  // The slug of the card currently turned over, if any.
+  const [flipped, setFlipped] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("All");
 
   // Deepest first. This order is the ranking, and it is the tab order.
@@ -38,8 +37,15 @@ export function Work() {
       <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
         <SonarScope
           contacts={ranked}
-          onSelect={setActive}
-          activeSlug={active?.slug}
+          onSelect={(p) => {
+            // A blip turns its card over and brings it into view, so the scope
+            // and the grid stay one selection rather than two.
+            setFlipped(p.slug);
+            document
+              .querySelector(`[data-card="${p.slug}"]`)
+              ?.scrollIntoView({ block: "center", behavior: "smooth" });
+          }}
+          activeSlug={flipped ?? undefined}
         />
 
         <Panel label="How this is ranked">
@@ -115,17 +121,12 @@ export function Work() {
               key={p.slug}
               project={p}
               index={ranked.indexOf(p)}
-              onSelect={setActive}
+              flipped={flipped === p.slug}
+              onToggle={(slug) => setFlipped(slug)}
             />
           ))}
         </div>
       </div>
-
-      <ContactSheet
-        project={active}
-        open={active !== null}
-        onOpenChange={(o) => !o && setActive(null)}
-      />
     </div>
   );
 }
