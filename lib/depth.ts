@@ -49,6 +49,21 @@ export function progressToDepth(progress: number): number {
 }
 
 /**
+ * Depth from a position *within one zone's section*, rather than from overall
+ * scroll progress.
+ *
+ * The zones are wildly unequal in metres — Surface spans 40 m, Hadal spans
+ * 5,034 — but their sections are roughly equal on screen. Mapping raw scroll
+ * progress across the whole page therefore puts the reader at 3,600 m while
+ * the heading above them still says Twilight. Interpolating inside the zone
+ * the reader is actually in keeps the nav, the headings and the HUD agreeing.
+ */
+export function zoneProgressToDepth(zoneId: ZoneId, t: number): number {
+  const z = ZONES.find((x) => x.id === zoneId) ?? ZONES[0];
+  return z.min + clamp(t, 0, 1) * (z.max - z.min);
+}
+
+/**
  * Overlay alpha. Square-rooted so the light falls off fast near the surface,
  * which is how water actually behaves — most of the sunlight is gone by 200 m.
  */

@@ -10,6 +10,8 @@ import {
   depthToVeil,
   depthToZone,
   progressToDepth,
+  zoneProgressToDepth,
+  type ZoneId,
 } from "@/lib/depth";
 
 export interface DepthState {
@@ -55,12 +57,41 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
     startedAt.current = performance.now();
     lastT.current = startedAt.current;
 
+    const ZONE_IDS = new Set(ZONES.map((z) => z.id as string));
+
+    /**
+     * Depth comes from position within the zone's own section, not from raw
+     * page progress: the zones are wildly unequal in metres but roughly equal
+     * on screen, so raw progress reads 3,600 m under a heading that says
+     * Twilight. Falls back to page progress if the sections are not in the
+     * DOM yet.
+     */
+    const measureDepth = (): number => {
+      const sections = document.querySelectorAll<HTMLElement>("main section[id]");
+      if (sections.length === 0) {
+        const scrollable =
+          document.documentElement.scrollHeight - window.innerHeight;
+        return progressToDepth(scrollable > 0 ? window.scrollY / scrollable : 0);
+      }
+
+      // Anchor a little below the top of the viewport, so the reading matches
+      // the section whose content the reader is actually looking at.
+      const anchor = window.scrollY + window.innerHeight * 0.35;
+
+      let current: HTMLElement | null = null;
+      for (const s of sections) {
+        if (!ZONE_IDS.has(s.id)) continue;
+        if (s.offsetTop <= anchor) current = s;
+      }
+      if (!current) current = sections[0];
+
+      const t = (anchor - current.offsetTop) / Math.max(current.offsetHeight, 1);
+      return zoneProgressToDepth(current.id as ZoneId, t);
+    };
+
     const tick = () => {
       const now = performance.now();
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
-      const depth = progressToDepth(progress);
+      const depth = measureDepth();
 
       const dt = Math.max(now - lastT.current, 1);
       const instant = ((depth - lastDepth.current) / dt) * 1000;

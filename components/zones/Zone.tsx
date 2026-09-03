@@ -22,7 +22,7 @@ export function Zone({
       <header className="mb-12 flex items-baseline gap-4 border-b border-border pb-4">
         <h2
           id={`${id}-heading`}
-          className="text-sm font-medium uppercase tracking-[0.3em]"
+          className="font-display text-base font-medium tracking-[0.3em] uppercase"
         >
           {label}
         </h2>

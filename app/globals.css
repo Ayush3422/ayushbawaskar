@@ -5,9 +5,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-inter);
+  --font-sans: var(--font-plex-mono);
+  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-pixelify);
+  --font-serif: var(--font-instrument-serif);
+  --font-heading: var(--font-pixelify);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -135,5 +137,28 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes sonar-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Each contact lights as the sweep passes it, then decays. The phase comes
+ * from the contact's own bearing, so the flash and the sweep line agree.
+ */
+@keyframes sonar-ping {
+  0% {
+    background: var(--signal);
+  }
+  18%,
+  100% {
+    background: var(--muted-foreground);
   }
 }

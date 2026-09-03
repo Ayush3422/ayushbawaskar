@@ -7,6 +7,7 @@ import {
   progressToDepth,
   depthToVeil,
   depthToSnowDensity,
+  zoneProgressToDepth,
 } from "@/lib/depth";
 
 describe("MAX_DEPTH", () => {
@@ -98,5 +99,33 @@ describe("depthToSnowDensity", () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe("zoneProgressToDepth", () => {
+  it("spans exactly the zone it names", () => {
+    expect(zoneProgressToDepth("twilight", 0)).toBe(200);
+    expect(zoneProgressToDepth("twilight", 1)).toBe(1000);
+    expect(zoneProgressToDepth("twilight", 0.5)).toBeCloseTo(600);
+  });
+
+  it("reaches the deepest point at the end of the hadal zone", () => {
+    expect(zoneProgressToDepth("hadal", 1)).toBe(MAX_DEPTH);
+  });
+
+  it("keeps every zone's depth inside that zone, which is the whole point", () => {
+    for (const z of ZONES) {
+      for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+        const d = zoneProgressToDepth(z.id, t);
+        expect(d).toBeGreaterThanOrEqual(z.min);
+        expect(d).toBeLessThanOrEqual(z.max);
+        if (t < 1) expect(depthToZone(d).id).toBe(z.id);
+      }
+    }
+  });
+
+  it("clamps progress outside 0..1", () => {
+    expect(zoneProgressToDepth("abyssal", -3)).toBe(4000);
+    expect(zoneProgressToDepth("abyssal", 9)).toBe(6000);
   });
 });

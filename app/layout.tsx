@@ -1,9 +1,26 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Pixelify_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+/** UI, labels and every instrument readout. */
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+});
+
+/** Display face for headings and the wordmark. */
+const pixelify = Pixelify_Sans({
+  subsets: ["latin"],
+  variable: "--font-pixelify",
+});
+
+/** Running prose — the passages where Ayush is talking rather than measuring. */
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+});
 
 export const metadata: Metadata = {
   title: "Ayush Bawaskar — ABYSS",
@@ -15,7 +32,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`dark ${plexMono.variable} ${pixelify.variable} ${instrumentSerif.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

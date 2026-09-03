@@ -12,7 +12,7 @@ export function DepthNav() {
       className="fixed inset-x-0 top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur"
     >
       <div className="flex items-center justify-between px-6 py-3 md:px-12">
-        <a href="#surface" className="font-mono text-xs tracking-[0.3em]">
+        <a href="#surface" className="font-display text-sm tracking-[0.3em]">
           AYUSH<span style={{ color: "var(--signal)" }}> // </span>ABYSS
         </a>
         <ul className="hidden gap-6 md:flex">

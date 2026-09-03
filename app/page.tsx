@@ -3,6 +3,7 @@ import { DepthNav } from "@/components/nav/DepthNav";
 import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { Zone } from "@/components/zones/Zone";
+import { SonarScope } from "@/components/sonar/SonarScope";
 import { profile } from "@/data/profile";
 
 export default function Page() {
@@ -29,7 +30,7 @@ export default function Page() {
 
       <main id="main">
         <Zone id="surface" label="Surface" depthLabel="0 — 40 m">
-          <h1 className="max-w-4xl text-4xl leading-tight font-semibold md:text-6xl">
+          <h1 className="font-display max-w-4xl text-4xl leading-tight font-semibold md:text-6xl">
             {profile.heroLine}
           </h1>
           <p className="mt-6 font-mono text-sm text-muted-foreground">
@@ -38,7 +39,9 @@ export default function Page() {
         </Zone>
 
         <Zone id="sunlight" label="Sunlight" depthLabel="40 — 200 m" />
-        <Zone id="twilight" label="Twilight" depthLabel="200 — 1,000 m" />
+        <Zone id="twilight" label="Twilight" depthLabel="200 — 1,000 m">
+          <SonarScope />
+        </Zone>
         <Zone id="midnight" label="Midnight" depthLabel="1,000 — 4,000 m" />
         <Zone id="abyssal" label="Abyssal" depthLabel="4,000 — 6,000 m" />
         <Zone id="hadal" label="Hadal" depthLabel="6,000 — 11,034 m" />
