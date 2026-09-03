@@ -3,6 +3,8 @@ import { DepthNav } from "@/components/nav/DepthNav";
 import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { MarineSnow } from "@/components/ocean/MarineSnow";
+import { Bioluminescence } from "@/components/ocean/Bioluminescence";
+import { TrenchFloor } from "@/components/ocean/TrenchFloor";
 import { Zone } from "@/components/zones/Zone";
 import { Surface } from "@/components/zones/Surface";
 import { About } from "@/components/zones/About";
@@ -23,6 +25,7 @@ export default function Page() {
 
       <OceanLayer />
       <MarineSnow />
+      <Bioluminescence />
 
       {/*
        * Near-surface scrim. It has to be fixed and full-viewport like the
@@ -99,6 +102,7 @@ export default function Page() {
           depthLabel="6,000 — 11,034 m"
           lede="The bottom of the trench. Nothing below this."
         >
+          <TrenchFloor />
           <Contact />
         </Zone>
       </main>

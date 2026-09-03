@@ -80,11 +80,20 @@
    */
   --signal: #e57373;
 
+  /*
+   * The single exception to the one-accent rule, and it is confined to the
+   * hadal zone. Real bioluminescence is blue-green, and below 6,000 m it is
+   * the only light there is — so the page earns a second colour exactly where
+   * physics puts one, and nowhere else.
+   */
+  --biolum: #57cfc0;
+
   /* Written every frame by DepthProvider. */
   --depth-veil: 0;
   --depth-tint: 1;
   --snow-density: 0;
   --surface-scrim: 1;
+  --hadal-presence: 0;
 
   --chart-1: #d4d4d4;
   --chart-2: #a1a1a1;

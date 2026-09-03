@@ -126,6 +126,11 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
         "--surface-scrim",
         Math.max(0, 1 - depth / 400).toFixed(4),
       );
+      // Hadal presence: nothing until the abyssal zone, full by 7,000 m.
+      root.setProperty(
+        "--hadal-presence",
+        Math.min(1, Math.max(0, (depth - 4000) / 3000)).toFixed(4),
+      );
 
       // React state, by contrast, re-renders every consumer. Commit only when a
       // value someone actually displays has changed: whole metres of depth,
