@@ -43,8 +43,14 @@ const SPECTRUM = {
 
 /** Depth at which the camera passes through the surface. */
 const SURFACE_CROSSING = 120;
-/** Depth by which the water has gone fully black. */
+/** Depth by which the water reaches its darkest. */
 const FULL_DARK = 4000;
+/**
+ * How dark the water is allowed to get. Kept below 1 so the swell stays
+ * visible all the way down — at full darkness the footer sat on a black
+ * rectangle and the simulation may as well not have been running.
+ */
+const DARKEST = 0.55;
 
 /**
  * A renderer that failed to initialise. The page keeps its CSS fallback and
@@ -280,14 +286,23 @@ export function createRenderer({
       g.clearColor(0.039, 0.039, 0.039, 1);
       g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 
-      // Camera descends through the surface, then keeps going down.
-      const t = currentDepth / SURFACE_CROSSING;
+      // Camera descends through the surface and then settles, rather than
+      // falling forever: past a point there is nothing further to see, and a
+      // runaway camera just loses the surface entirely.
+      // Clamped tight. Let the camera fall further and the surface ends up
+      // past the mesh edge and fully fogged, so the deep zones render nothing.
+      const t = Math.min(currentDepth / SURFACE_CROSSING, 1.4);
       const eyeY = 17 - t * 30;
       const below = currentDepth > SURFACE_CROSSING ? 1 : 0;
-      const darkness = Math.min(currentDepth / FULL_DARK, 1);
+      const darkness = Math.min(currentDepth / FULL_DARK, 1) * DARKEST;
 
       const eye: [number, number, number] = [0, eyeY, 120];
-      const view = lookAt(eye, [0, eyeY - 10, -260], [0, 1, 0]);
+      // Below the surface the camera looks up at the underside of the swell.
+      const view = lookAt(
+        eye,
+        [0, below ? eyeY + 40 : eyeY - 10, -260],
+        [0, 1, 0],
+      );
       const proj = perspective(
         (55 * Math.PI) / 180,
         Math.max(w / Math.max(h, 1), 0.0001),

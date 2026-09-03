@@ -71,9 +71,13 @@ describe("progressToDepth", () => {
 });
 
 describe("depthToVeil", () => {
-  it("runs from clear at the surface to 0.72 in the hadal zone", () => {
+  it("runs from clear at the surface to its cap in the hadal zone", () => {
     expect(depthToVeil(0)).toBe(0);
-    expect(depthToVeil(MAX_DEPTH)).toBeCloseTo(0.72);
+    expect(depthToVeil(MAX_DEPTH)).toBeCloseTo(0.46);
+  });
+
+  it("never darkens far enough to hide the ocean behind it", () => {
+    expect(depthToVeil(MAX_DEPTH)).toBeLessThan(0.6);
   });
 
   it("increases monotonically", () => {

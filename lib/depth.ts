@@ -69,7 +69,9 @@ export function zoneProgressToDepth(zoneId: ZoneId, t: number): number {
  */
 export function depthToVeil(depth: number): number {
   const t = clamp(depth, 0, MAX_DEPTH) / MAX_DEPTH;
-  return 0.72 * Math.sqrt(t);
+  // Capped at 0.46 rather than 0.72: past that the veil crushes the ocean
+  // behind it and the deep zones sit on a flat black rectangle.
+  return 0.46 * Math.sqrt(t);
 }
 
 /** Gaussian centred on the twilight zone, where marine snow is thickest. */

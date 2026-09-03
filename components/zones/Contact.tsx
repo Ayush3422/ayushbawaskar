@@ -1,6 +1,5 @@
 import { profile, colophon } from "@/data/profile";
 import { Label, Panel, PixelRule, SpecSheet, Stamp } from "@/components/ui/primitives";
-import { DiveProfile } from "./DiveProfile";
 
 export function Contact() {
   return (
@@ -146,9 +145,7 @@ export function Contact() {
       </div>
 
       <div className="border-t-2 border-border pt-10">
-        <DiveProfile />
-
-        <div className="mt-10 grid gap-8 border-t-2 border-border pt-8 lg:grid-cols-[1fr_auto_auto] lg:items-end">
+        <div className="grid gap-8 lg:grid-cols-[1fr_auto_auto] lg:items-end">
           <div>
             <p className="font-display text-3xl tracking-[0.22em] md:text-4xl">
               AYUSH<span style={{ color: "var(--signal)" }}>{" // "}</span>ABYSS
