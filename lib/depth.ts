@@ -1,0 +1,66 @@
+export const MAX_DEPTH = 11034;
+
+export type ZoneId =
+  | "surface"
+  | "sunlight"
+  | "twilight"
+  | "midnight"
+  | "abyssal"
+  | "hadal";
+
+export interface Zone {
+  id: ZoneId;
+  label: string;
+  min: number;
+  max: number;
+}
+
+export const ZONES: readonly Zone[] = [
+  { id: "surface", label: "Surface", min: 0, max: 40 },
+  { id: "sunlight", label: "Sunlight", min: 40, max: 200 },
+  { id: "twilight", label: "Twilight", min: 200, max: 1000 },
+  { id: "midnight", label: "Midnight", min: 1000, max: 4000 },
+  { id: "abyssal", label: "Abyssal", min: 4000, max: 6000 },
+  { id: "hadal", label: "Hadal", min: 6000, max: MAX_DEPTH },
+] as const;
+
+const clamp = (v: number, lo: number, hi: number) =>
+  v < lo ? lo : v > hi ? hi : v;
+
+/**
+ * A depth exactly on a boundary belongs to the deeper zone, so descending past
+ * 200 m reads as "Twilight" rather than lingering on "Sunlight". MAX_DEPTH is
+ * the sole exception — there is no deeper zone to fall into.
+ */
+export function depthToZone(depth: number): Zone {
+  const d = clamp(depth, 0, MAX_DEPTH);
+  for (let i = ZONES.length - 1; i >= 0; i--) {
+    if (d >= ZONES[i].min) return ZONES[i];
+  }
+  return ZONES[0];
+}
+
+export function depthToPressure(depth: number): number {
+  return clamp(depth, 0, MAX_DEPTH) / 10 + 1;
+}
+
+export function progressToDepth(progress: number): number {
+  return clamp(progress, 0, 1) * MAX_DEPTH;
+}
+
+/**
+ * Overlay alpha. Square-rooted so the light falls off fast near the surface,
+ * which is how water actually behaves — most of the sunlight is gone by 200 m.
+ */
+export function depthToVeil(depth: number): number {
+  const t = clamp(depth, 0, MAX_DEPTH) / MAX_DEPTH;
+  return 0.72 * Math.sqrt(t);
+}
+
+/** Gaussian centred on the twilight zone, where marine snow is thickest. */
+export function depthToSnowDensity(depth: number): number {
+  const d = clamp(depth, 0, MAX_DEPTH);
+  const peak = 600;
+  const width = 2200;
+  return Math.exp(-((d - peak) ** 2) / (2 * width ** 2));
+}
