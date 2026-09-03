@@ -51,6 +51,13 @@ const FULL_DARK = 4000;
  * rectangle and the simulation may as well not have been running.
  */
 const DARKEST = 0.55;
+/**
+ * Through the deepest zone the view returns to the surface, so the footer
+ * shows the same lit swell the hero does. These mirror lib/depth rather than
+ * importing it, to keep the ocean self-contained as a drop-in component.
+ */
+const HADAL_START = 6000;
+const DEEPEST = 11034;
 
 /**
  * A renderer that failed to initialise. The page keeps its CSS fallback and
@@ -286,15 +293,23 @@ export function createRenderer({
       g.clearColor(0.039, 0.039, 0.039, 1);
       g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
 
-      // Camera descends through the surface and then settles, rather than
-      // falling forever: past a point there is nothing further to see, and a
-      // runaway camera just loses the surface entirely.
-      // Clamped tight. Let the camera fall further and the surface ends up
-      // past the mesh edge and fully fogged, so the deep zones render nothing.
-      const t = Math.min(currentDepth / SURFACE_CROSSING, 1.4);
+      // Camera descends through the surface and settles rather than falling
+      // forever — unclamped it drops far enough that the surface sits past the
+      // mesh edge and fogs out, and the deep zones render nothing at all.
+      const descent = Math.min(currentDepth / SURFACE_CROSSING, 1.4);
+
+      // Across the hadal zone the view rises back to the surface, so the page
+      // ends on the same lit swell it opened with.
+      const rise = Math.min(
+        Math.max((currentDepth - HADAL_START) / (DEEPEST - HADAL_START), 0),
+        1,
+      );
+
+      const t = descent * (1 - rise);
       const eyeY = 17 - t * 30;
-      const below = currentDepth > SURFACE_CROSSING ? 1 : 0;
-      const darkness = Math.min(currentDepth / FULL_DARK, 1) * DARKEST;
+      const below = t > 1 ? 1 : 0;
+      const darkness =
+        Math.min(currentDepth / FULL_DARK, 1) * DARKEST * (1 - rise);
 
       const eye: [number, number, number] = [0, eyeY, 120];
       // Below the surface the camera looks up at the underside of the swell.

@@ -175,7 +175,7 @@ export function Contact() {
 
           <a
             href="#surface"
-            className="group flex items-center gap-3 border-2 border-border px-4 py-3 font-mono text-[10px] tracking-[0.25em] uppercase transition-colors hover:border-[var(--signal)]"
+            className="group flex items-center gap-3 border-2 border-border bg-card/80 px-4 py-3 font-mono text-[10px] tracking-[0.25em] uppercase backdrop-blur transition-colors hover:border-[var(--signal)]"
             style={{ color: "var(--signal)" }}
           >
             <span aria-hidden="true">▴</span>

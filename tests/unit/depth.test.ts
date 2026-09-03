@@ -71,22 +71,23 @@ describe("progressToDepth", () => {
 });
 
 describe("depthToVeil", () => {
-  it("runs from clear at the surface to its cap in the hadal zone", () => {
+  it("is clear at both ends — the page opens and closes on lit water", () => {
     expect(depthToVeil(0)).toBe(0);
-    expect(depthToVeil(MAX_DEPTH)).toBeCloseTo(0.46);
+    expect(depthToVeil(MAX_DEPTH)).toBeCloseTo(0);
+  });
+
+  it("darkens through the descent, then lifts across the hadal zone", () => {
+    expect(depthToVeil(200)).toBeGreaterThan(depthToVeil(0));
+    expect(depthToVeil(4000)).toBeGreaterThan(depthToVeil(1000));
+    expect(depthToVeil(6000)).toBeGreaterThan(depthToVeil(11034));
   });
 
   it("never darkens far enough to hide the ocean behind it", () => {
-    expect(depthToVeil(MAX_DEPTH)).toBeLessThan(0.6);
-  });
-
-  it("increases monotonically", () => {
-    let prev = -1;
-    for (let d = 0; d <= MAX_DEPTH; d += 500) {
-      const v = depthToVeil(d);
-      expect(v).toBeGreaterThanOrEqual(prev);
-      prev = v;
+    let worst = 0;
+    for (let d = 0; d <= MAX_DEPTH; d += 100) {
+      worst = Math.max(worst, depthToVeil(d));
     }
+    expect(worst).toBeLessThan(0.5);
   });
 });
 

@@ -63,15 +63,23 @@ export function zoneProgressToDepth(zoneId: ZoneId, t: number): number {
   return z.min + clamp(t, 0, 1) * (z.max - z.min);
 }
 
+/** Where the view begins returning to the surface. Mirrors the ocean renderer. */
+const HADAL_START = 6000;
+
 /**
  * Overlay alpha. Square-rooted so the light falls off fast near the surface,
  * which is how water actually behaves — most of the sunlight is gone by 200 m.
+ *
+ * It then lifts again across the hadal zone. That is not oceanography: the
+ * page ends on the lit surface it opened with, and the veil has to get out of
+ * the way for that to be visible. Capped at 0.46 even at its darkest, because
+ * past that it crushes the ocean behind it into a flat black rectangle.
  */
 export function depthToVeil(depth: number): number {
-  const t = clamp(depth, 0, MAX_DEPTH) / MAX_DEPTH;
-  // Capped at 0.46 rather than 0.72: past that the veil crushes the ocean
-  // behind it and the deep zones sit on a flat black rectangle.
-  return 0.46 * Math.sqrt(t);
+  const d = clamp(depth, 0, MAX_DEPTH);
+  const t = d / MAX_DEPTH;
+  const rise = clamp((d - HADAL_START) / (MAX_DEPTH - HADAL_START), 0, 1);
+  return 0.46 * Math.sqrt(t) * (1 - rise);
 }
 
 /** Gaussian centred on the twilight zone, where marine snow is thickest. */
