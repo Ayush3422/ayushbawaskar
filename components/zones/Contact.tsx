@@ -4,9 +4,33 @@ import { Label, Panel, SpecSheet } from "@/components/ui/primitives";
 export function Contact() {
   return (
     <div className="space-y-16">
-      <h3 className="font-display text-[clamp(2.5rem,8vw,6rem)] leading-[0.95] tracking-tight uppercase">
-        Let&apos;s <span style={{ color: "var(--signal)" }}>talk</span>
-      </h3>
+      <div className="grid gap-10 xl:grid-cols-[1fr_1fr] xl:items-end xl:gap-20">
+        <h3 className="font-display text-[clamp(2.5rem,7vw,6rem)] leading-[0.95] tracking-tight uppercase">
+          Let&apos;s <span style={{ color: "var(--signal)" }}>talk</span>
+        </h3>
+
+        <div className="rounded-lg border border-border bg-card/35 p-5">
+          <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+            <Label>Dive complete</Label>
+            <Label>11,034 m</Label>
+          </div>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+            {[
+              { v: "11,034", l: "Metres descended" },
+              { v: "6", l: "Zones traversed" },
+              { v: "5", l: "Contacts inspected" },
+              { v: "1,104", l: "Bar at the floor" },
+            ].map((s) => (
+              <div key={s.l}>
+                <div className="font-mono text-xl tabular-nums">{s.v}</div>
+                <div className="mt-1">
+                  <Label>{s.l}</Label>
+                </div>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
 
       <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-16">
         <div>
