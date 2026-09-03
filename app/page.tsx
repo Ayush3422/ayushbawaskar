@@ -4,6 +4,10 @@ import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { Zone } from "@/components/zones/Zone";
 import { SonarScope } from "@/components/sonar/SonarScope";
+import { About } from "@/components/zones/About";
+import { Capability } from "@/components/zones/Capability";
+import { CareerLog } from "@/components/zones/CareerLog";
+import { Contact } from "@/components/zones/Contact";
 import { profile } from "@/data/profile";
 
 export default function Page() {
@@ -38,13 +42,21 @@ export default function Page() {
           </p>
         </Zone>
 
-        <Zone id="sunlight" label="Sunlight" depthLabel="40 — 200 m" />
+        <Zone id="sunlight" label="Sunlight" depthLabel="40 — 200 m">
+          <About />
+        </Zone>
         <Zone id="twilight" label="Twilight" depthLabel="200 — 1,000 m">
           <SonarScope />
         </Zone>
-        <Zone id="midnight" label="Midnight" depthLabel="1,000 — 4,000 m" />
-        <Zone id="abyssal" label="Abyssal" depthLabel="4,000 — 6,000 m" />
-        <Zone id="hadal" label="Hadal" depthLabel="6,000 — 11,034 m" />
+        <Zone id="midnight" label="Midnight" depthLabel="1,000 — 4,000 m">
+          <Capability />
+        </Zone>
+        <Zone id="abyssal" label="Abyssal" depthLabel="4,000 — 6,000 m">
+          <CareerLog />
+        </Zone>
+        <Zone id="hadal" label="Hadal" depthLabel="6,000 — 11,034 m">
+          <Contact />
+        </Zone>
       </main>
     </DepthProvider>
   );
