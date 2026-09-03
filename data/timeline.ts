@@ -16,6 +16,10 @@ export const timeline: TimelineEntry[] = [
     title: "First shipped repositories",
     detail:
       "VortiFi and QuantumChat — a Solidity voting DApp and an educational post-quantum messaging prototype.",
+    artifacts: [
+      { name: "VortiFi", url: "https://github.com/Ayush3422/VortiFi" },
+      { name: "QuantumChat", url: "https://github.com/Ayush3422/quantum_crypto" },
+    ],
   },
   {
     when: "2025 — 2026",
@@ -27,11 +31,22 @@ export const timeline: TimelineEntry[] = [
     title: "Applied ML portfolio",
     detail:
       "ENERGY_FORECASTING and BookSense AI — grid load forecasting and a hybrid recommender, both evaluated against real baselines rather than reported in isolation.",
+    artifacts: [
+      {
+        name: "ENERGY_FORECASTING",
+        url: "https://github.com/Ayush3422/ENERGY_FORECASTING",
+      },
+      {
+        name: "BookSense AI",
+        url: "https://github.com/Ayush3422/book-recommendation-system",
+      },
+    ],
   },
   {
     when: "Sep 2026",
     title: "NOSTRO",
     detail:
       "Three-way settlement reconciliation for the Razorpay AI Buildathon, Track 4.",
+    artifacts: [{ name: "NOSTRO", url: "https://github.com/Ayush3422/NOSTRO" }],
   },
 ];

@@ -42,6 +42,8 @@ export interface TimelineEntry {
   when: string;
   title: string;
   detail: string;
+  /** What the period produced, each one checkable. */
+  artifacts?: { name: string; url: string }[];
 }
 
 export interface Profile {
