@@ -63,3 +63,59 @@ export const skills: Skill[] = [
   { name: "Next.js / Tailwind", depth: 600, evidenceSlug: "abyss", evidenceLabel: "This site" },
   { name: "WebGL2 / GLSL", depth: 600, evidenceSlug: "abyss", evidenceLabel: "This site" },
 ];
+
+/**
+ * The same competences grouped for the inventory matrix. Every entry appears
+ * because a repository on this page uses it — nothing aspirational.
+ */
+export const skillGroups: { category: string; items: string[] }[] = [
+  {
+    category: "Languages",
+    items: ["Python", "TypeScript", "JavaScript", "Solidity", "C"],
+  },
+  {
+    category: "Applied ML",
+    items: [
+      "XGBoost",
+      "scikit-learn",
+      "implicit / ALS",
+      "TF-IDF",
+      "SHAP",
+      "pandas",
+      "NumPy",
+    ],
+  },
+  {
+    category: "Evaluation",
+    items: [
+      "Held-out splits",
+      "Chronological splits",
+      "Precision@K · NDCG",
+      "Catalog coverage",
+      "Cold-start simulation",
+      "Scripted, reproducible reports",
+    ],
+  },
+  {
+    category: "Web",
+    items: [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Vite",
+      "Node.js",
+      "Express",
+      "WebSockets",
+      "WebGL2 / GLSL",
+    ],
+  },
+  {
+    category: "Blockchain",
+    items: ["Solidity", "Hardhat", "Hardhat Ignition", "ethers.js", "Ethereum"],
+  },
+  {
+    category: "Cryptography",
+    items: ["AES-256-GCM", "Kyber KEM (simulated)", "Key exchange"],
+  },
+  { category: "Tools", items: ["Git", "VS Code", "Google Colab", "Vercel"] },
+];

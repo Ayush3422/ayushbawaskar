@@ -27,19 +27,21 @@ test("decorative layers are hidden from assistive technology", async ({
   }
 });
 
-test("every section heading is reachable in document order", async ({
-  page,
-}) => {
+test("every zone heading is reachable in document order", async ({ page }) => {
   await page.goto("/");
   const headings = await page.locator("section > header h2").allTextContents();
   expect(headings).toEqual([
-    "Surface",
     "Sunlight",
     "Twilight",
     "Midnight",
     "Abyssal",
     "Hadal",
   ]);
+});
+
+test("the surface zone is titled by the page h1", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("section#surface h1")).toHaveCount(1);
 });
 
 test("the page has exactly one h1", async ({ page }) => {

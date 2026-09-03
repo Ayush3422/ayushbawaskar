@@ -4,19 +4,19 @@ import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { MarineSnow } from "@/components/ocean/MarineSnow";
 import { Zone } from "@/components/zones/Zone";
-import { SonarScope } from "@/components/sonar/SonarScope";
+import { Surface } from "@/components/zones/Surface";
 import { About } from "@/components/zones/About";
+import { Work } from "@/components/zones/Work";
 import { Capability } from "@/components/zones/Capability";
 import { CareerLog } from "@/components/zones/CareerLog";
 import { Contact } from "@/components/zones/Contact";
-import { profile } from "@/data/profile";
 
 export default function Page() {
   return (
     <DepthProvider>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-card focus:px-4 focus:py-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-card focus:px-4 focus:py-2"
       >
         Skip to content
       </a>
@@ -35,28 +35,55 @@ export default function Page() {
       <DiveComputer />
 
       <main id="main">
-        <Zone id="surface" label="Surface" depthLabel="0 — 40 m">
-          <h1 className="font-display max-w-4xl text-4xl leading-tight font-semibold md:text-6xl">
-            {profile.heroLine}
-          </h1>
-          <p className="mt-6 font-mono text-sm text-muted-foreground">
-            {profile.name} · {profile.role}
-          </p>
-        </Zone>
+        <Surface />
 
-        <Zone id="sunlight" label="Sunlight" depthLabel="40 — 200 m">
+        <Zone
+          id="sunlight"
+          plate="01"
+          label="Sunlight"
+          depthLabel="40 — 200 m"
+          lede="Light still reaches here, so this is where the claims get made — and where you should start checking them."
+        >
           <About />
         </Zone>
-        <Zone id="twilight" label="Twilight" depthLabel="200 — 1,000 m">
-          <SonarScope />
+
+        <Zone
+          id="twilight"
+          plate="02"
+          label="Twilight"
+          depthLabel="200 — 1,000 m"
+          lede="Bearing is the domain. Range is how deep the work goes — the same scale as the depth you are at. Deeper contacts took more to get right."
+        >
+          <Work />
         </Zone>
-        <Zone id="midnight" label="Midnight" depthLabel="1,000 — 4,000 m">
+
+        <Zone
+          id="midnight"
+          plate="03"
+          label="Midnight"
+          depthLabel="1,000 — 4,000 m"
+          lede="Competence plotted against evidence rather than confidence. Every marker names the project that put it there."
+        >
           <Capability />
         </Zone>
-        <Zone id="abyssal" label="Abyssal" depthLabel="4,000 — 6,000 m">
+
+        <Zone
+          id="abyssal"
+          plate="04"
+          label="Abyssal"
+          depthLabel="4,000 — 6,000 m"
+          lede="What happened, in order — and the working rules each piece of it taught."
+        >
           <CareerLog />
         </Zone>
-        <Zone id="hadal" label="Hadal" depthLabel="6,000 — 11,034 m">
+
+        <Zone
+          id="hadal"
+          plate="05"
+          label="Hadal"
+          depthLabel="6,000 — 11,034 m"
+          lede="The bottom of the trench. Nothing below this."
+        >
           <Contact />
         </Zone>
       </main>

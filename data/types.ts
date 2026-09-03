@@ -48,6 +48,8 @@ export interface Profile {
   name: string;
   heroLine: string;
   role: string;
+  status: string;
+  location: string;
   education: { degree: string; institution: string; period: string }[];
   links: { label: string; href: string }[];
   interests: string[];
