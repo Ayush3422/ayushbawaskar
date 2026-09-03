@@ -74,9 +74,22 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
         return progressToDepth(scrollable > 0 ? window.scrollY / scrollable : 0);
       }
 
-      // Anchor a little below the top of the viewport, so the reading matches
-      // the section whose content the reader is actually looking at.
-      const anchor = window.scrollY + window.innerHeight * 0.35;
+      // The anchor slides from the top of the viewport at the top of the page
+      // to its bottom at the bottom of the page. A fixed offset (say 35% down)
+      // never sweeps past the final section, so the deepest reachable reading
+      // would be ~7,750 m while the copy promises 11,034 — the site would be
+      // contradicted by its own instrument. This reaches exactly 0 and exactly
+      // MAX_DEPTH at the two ends.
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      // Sub-pixel rounding in offsetTop/offsetHeight leaves the bottom of the
+      // page a few metres short of the Challenger Deep. The contact zone's
+      // copy names 11,034 exactly, so land on it exactly.
+      if (maxScroll > 0 && window.scrollY >= maxScroll - 1) return MAX_DEPTH;
+
+      const through = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      const anchor = window.scrollY + window.innerHeight * through;
 
       let current: HTMLElement | null = null;
       for (const s of sections) {
