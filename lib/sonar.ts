@@ -16,5 +16,8 @@ export function contactToXY(
   const t = Math.min(Math.max(rangeM / MAX_DEPTH, 0), 1);
   const r = t * radius;
   const rad = ((bearingDeg - 90) * Math.PI) / 180;
-  return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
+  // Rounded so server and client serialise identically; unrounded trig
+  // diverges in the last bits and React reports a hydration mismatch.
+  const round = (n: number) => Math.round(n * 1000) / 1000;
+  return { x: round(r * Math.cos(rad)), y: round(r * Math.sin(rad)) };
 }

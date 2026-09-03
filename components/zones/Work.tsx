@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { projects } from "@/data/projects";
 import { SonarScope } from "@/components/sonar/SonarScope";
 import { ContactCard } from "@/components/sonar/ContactCard";
-import { Label, Panel } from "@/components/ui/primitives";
+import { Label, Panel, PixelRule, Stamp } from "@/components/ui/primitives";
 
 /** The broad bearing a project sits on, used for the filter bar. */
 const sector = (domain: string) => domain.split(" / ")[0];
@@ -34,19 +34,53 @@ export function Work() {
 
   return (
     <div className="space-y-14">
-      <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
-        <SonarScope
-          contacts={ranked}
-          onSelect={(p) => {
-            // A blip turns its card over and brings it into view, so the scope
-            // and the grid stay one selection rather than two.
-            setFlipped(p.slug);
-            document
-              .querySelector(`[data-card="${p.slug}"]`)
-              ?.scrollIntoView({ block: "center", behavior: "smooth" });
-          }}
-          activeSlug={flipped ?? undefined}
-        />
+      <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-stretch lg:gap-10">
+        {/* The scope gets the same frame as the panel beside it — unframed it
+            floated in its column while the right half was fully dressed. */}
+        <div className="hard-shadow border-2 border-border bg-card/45 p-5">
+          <div className="mb-4 flex items-center gap-3">
+            <Stamp>Contact scope</Stamp>
+            <div className="flex-1">
+              <PixelRule />
+            </div>
+          </div>
+
+          <SonarScope
+            contacts={ranked}
+            onSelect={(p) => {
+              // A blip turns its card over and brings it into view, so the
+              // scope and the grid stay one selection rather than two.
+              setFlipped(p.slug);
+              document
+                .querySelector(`[data-card="${p.slug}"]`)
+                ?.scrollIntoView({ block: "center", behavior: "smooth" });
+            }}
+            activeSlug={flipped ?? undefined}
+          />
+
+          <dl className="mt-5 grid grid-cols-2 gap-y-4 border-t-2 border-border pt-4 sm:grid-cols-4">
+            {[
+              { l: "Sweep", v: "6.0 s" },
+              { l: "Returns", v: String(ranked.length) },
+              { l: "Max range", v: "11,034 m" },
+              {
+                l: "Selected",
+                v: flipped
+                  ? (ranked.find((p) => p.slug === flipped)?.name ?? "—")
+                  : "—",
+              },
+            ].map((r) => (
+              <div key={r.l}>
+                <dt>
+                  <Label>{r.l}</Label>
+                </dt>
+                <dd className="mt-1 truncate font-mono text-sm tabular-nums">
+                  {r.v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
 
         <Panel label="How this is ranked">
           <p className="font-mono text-sm leading-[1.85] text-muted-foreground">
@@ -86,6 +120,31 @@ export function Work() {
               </dd>
             </div>
           </dl>
+
+          {/* Legend for the scope: which blip is at which bearing. */}
+          <div className="mt-6 border-t-2 border-border pt-4">
+            <Label>Bearing key</Label>
+            <ol className="mt-3 divide-y-2 divide-border border-y-2 border-border">
+              {[...ranked]
+                .sort((a, b) => a.bearing - b.bearing)
+                .map((p) => (
+                  <li
+                    key={p.slug}
+                    className="grid grid-cols-[3.5rem_1fr_auto] items-baseline gap-3 py-2"
+                  >
+                    <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                      {String(p.bearing).padStart(3, "0")}°
+                    </span>
+                    <span className="truncate font-mono text-[12px]">
+                      {p.name}
+                    </span>
+                    <span className="font-mono text-[10px] tracking-[0.15em] text-muted-foreground/70 uppercase">
+                      {p.domain}
+                    </span>
+                  </li>
+                ))}
+            </ol>
+          </div>
         </Panel>
       </div>
 
