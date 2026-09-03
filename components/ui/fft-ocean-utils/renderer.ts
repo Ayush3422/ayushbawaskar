@@ -37,7 +37,7 @@ const SPECTRUM = {
   windSpeed: 14,
   windDirX: 1,
   windDirZ: 0,
-  amplitude: 4e-7,
+  amplitude: 5.5e-7,
   smallWave: 1,
 };
 
@@ -282,7 +282,7 @@ export function createRenderer({
 
       // Camera descends through the surface, then keeps going down.
       const t = currentDepth / SURFACE_CROSSING;
-      const eyeY = 26 - t * 34;
+      const eyeY = 17 - t * 30;
       const below = currentDepth > SURFACE_CROSSING ? 1 : 0;
       const darkness = Math.min(currentDepth / FULL_DARK, 1);
 

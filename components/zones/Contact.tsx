@@ -131,21 +131,42 @@ export function Contact() {
         </Panel>
       </div>
 
-      <div className="border-t-2 border-border pt-8">
-        <div className="mb-4">
-          <PixelRule />
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
-            11,034 m · Challenger Deep · you have reached the bottom
+      {/*
+       * The page opens at 120px type; before this it closed at 10px muted
+       * text, so it trailed off rather than ending. A closing band mirrors the
+       * statement band in Sunlight and gives the descent a floor.
+       */}
+      <div className="dither relative border-y-2 border-border py-10">
+        <div className="corner-ticks relative px-4 md:px-8">
+          <p className="max-w-4xl font-serif text-3xl leading-[1.15] md:text-5xl">
+            Check the repositories. That is what they are for.
           </p>
+        </div>
+      </div>
+
+      <div className="border-t-2 border-border pt-10">
+        <div className="flex flex-wrap items-end justify-between gap-8">
+          <div>
+            <p className="font-display text-3xl tracking-[0.22em] md:text-4xl">
+              AYUSH<span style={{ color: "var(--signal)" }}>{" // "}</span>ABYSS
+            </p>
+            <p className="mt-3 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+              11,034 m · Challenger Deep · you have reached the bottom
+            </p>
+          </div>
+
           <a
             href="#surface"
-            className="font-mono text-[10px] tracking-[0.25em] uppercase transition-colors hover:text-foreground"
+            className="group flex items-center gap-3 border-2 border-border px-4 py-3 font-mono text-[10px] tracking-[0.25em] uppercase transition-colors hover:border-[var(--signal)]"
             style={{ color: "var(--signal)" }}
           >
-            ▴ Ascend to the surface
+            <span aria-hidden="true">▴</span>
+            Ascend to the surface
           </a>
+        </div>
+
+        <div className="mt-8">
+          <PixelRule />
         </div>
       </div>
     </div>

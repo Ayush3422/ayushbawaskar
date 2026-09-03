@@ -304,3 +304,43 @@
     transition: none;
   }
 }
+
+/*
+ * Entrance choreography. Deliberately CSS rather than a JS motion library:
+ * a JS reveal ships opacity:0 in the server HTML, so a failed or slow bundle
+ * leaves the hero blank. With animation-fill-mode: both the end state applies
+ * regardless, and the reduced-motion rule above collapses the duration.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Scroll cue: a mark falling down its rail, over and over. */
+@keyframes descend {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+.descend {
+  animation: descend 1.9s ease-in-out infinite;
+}

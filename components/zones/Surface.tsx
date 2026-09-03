@@ -12,6 +12,9 @@ const DIVE_PLAN: Record<string, string> = {
   hadal: "Contact, and how this was built",
 };
 
+/** Staggered entrance, in seconds. */
+const beat = (n: number) => ({ animationDelay: `${n * 0.09}s` });
+
 export function Surface() {
   return (
     <section
@@ -19,8 +22,22 @@ export function Surface() {
       aria-labelledby="surface-heading"
       className="relative flex min-h-[92vh] scroll-mt-24 flex-col justify-center px-6 py-24 md:px-12 lg:pr-[15rem]"
     >
+      {/* Scrim. The swell is bright enough at the surface that muted labels
+          lose contrast against it; this keeps the type readable without
+          flattening the water. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-[1]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(10,10,10,0.82) 0%, rgba(10,10,10,0.45) 40%, rgba(10,10,10,0.78) 100%)",
+        }}
+      />
       {/* Availability and location, the two things a recruiter looks for first. */}
-      <div className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-3">
+      <div
+        className="rise mb-10 flex flex-wrap items-center gap-x-4 gap-y-3"
+        style={beat(0)}
+      >
         <span
           aria-hidden="true"
           className="inline-block h-2 w-2"
@@ -43,25 +60,42 @@ export function Surface() {
             id="surface-heading"
             className="font-display text-[clamp(2.75rem,8.5vw,7.5rem)] leading-[0.95] tracking-tight uppercase"
           >
-            Measured <span style={{ color: "var(--signal)" }}>not</span>
-            <br />
-            Asserted
+            <span className="rise block" style={beat(1)}>
+              Measured <span style={{ color: "var(--signal)" }}>not</span>
+            </span>
+            <span className="rise block" style={beat(2)}>
+              Asserted
+            </span>
           </h1>
 
-          <p className="mt-8 max-w-2xl font-serif text-2xl leading-snug text-foreground/85 md:text-3xl">
+          <p
+            className="rise mt-8 max-w-2xl font-serif text-2xl leading-snug text-foreground/85 md:text-3xl"
+            style={beat(3)}
+          >
             {profile.heroLine}
           </p>
 
-          <p className="mt-4 font-mono text-sm text-muted-foreground">
-            {profile.name} · {profile.role}
-          </p>
+          {/* The name is the one thing a reader must leave with, so it is set
+              at size rather than trailing the headline as a caption. */}
+          <div
+            className="rise mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-t-2 border-border pt-6"
+            style={beat(4)}
+          >
+            <span className="font-display text-2xl tracking-[0.12em] md:text-3xl">
+              {profile.name}
+            </span>
+            <span className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground uppercase">
+              {profile.role}
+            </span>
+          </div>
         </div>
 
         <nav
           aria-label="Dive plan"
-          className="hard-shadow corner-ticks relative border-2 border-border bg-card/55 p-5"
+          className="rise hard-shadow corner-ticks relative border-2 border-border bg-card/55 p-5"
+          style={beat(5)}
         >
-          <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+          <div className="mb-3 flex items-baseline justify-between gap-4 border-b-2 border-border pb-2">
             <Label>Dive plan</Label>
             <Label>6 zones</Label>
           </div>
@@ -95,7 +129,10 @@ export function Surface() {
       </div>
 
       {/* Four figures, each restated with its source further down the page. */}
-      <dl className="mt-16 grid grid-cols-2 gap-y-8 border-t-2 border-border pt-10 md:grid-cols-4">
+      <dl
+        className="rise mt-16 grid grid-cols-2 gap-y-8 border-t-2 border-border pt-10 md:grid-cols-4"
+        style={beat(6)}
+      >
         {headlineStats.map((s) => (
           <Stat
             key={s.label}
@@ -107,9 +144,22 @@ export function Surface() {
         ))}
       </dl>
 
-      <p className="mt-10 font-mono text-[10px] tracking-[0.25em] text-muted-foreground/60 uppercase">
-        Scroll to descend · 0 m → 11,034 m
-      </p>
+      <div className="rise mt-12 flex items-center gap-4" style={beat(7)}>
+        {/* A mark falling down its rail, rather than a line of muted text
+            nobody notices. */}
+        <span
+          aria-hidden="true"
+          className="relative block h-6 w-px bg-border"
+        >
+          <span
+            className="descend absolute -left-[2px] block h-[5px] w-[5px]"
+            style={{ background: "var(--signal)" }}
+          />
+        </span>
+        <span className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground/70 uppercase">
+          Scroll to descend · 0 m → 11,034 m
+        </span>
+      </div>
     </section>
   );
 }
