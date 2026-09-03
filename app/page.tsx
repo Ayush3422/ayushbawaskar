@@ -1,5 +1,6 @@
 import { DepthProvider } from "@/components/depth/DepthProvider";
 import { DepthNav } from "@/components/nav/DepthNav";
+import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { Zone } from "@/components/zones/Zone";
 import { profile } from "@/data/profile";
@@ -24,6 +25,7 @@ export default function Page() {
       />
 
       <DepthNav />
+      <DiveComputer />
 
       <main id="main">
         <Zone id="surface" label="Surface" depthLabel="0 — 40 m">
