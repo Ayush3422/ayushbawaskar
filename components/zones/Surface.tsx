@@ -17,7 +17,7 @@ export function Surface() {
     <section
       id="surface"
       aria-labelledby="surface-heading"
-      className="relative flex min-h-[92vh] scroll-mt-16 flex-col justify-center px-6 py-24 md:px-12 lg:pr-[15rem]"
+      className="relative flex min-h-[92vh] scroll-mt-24 flex-col justify-center px-6 py-24 md:px-12 lg:pr-[15rem]"
     >
       {/* Availability and location, the two things a recruiter looks for first. */}
       <div className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-3">

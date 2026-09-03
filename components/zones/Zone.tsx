@@ -27,7 +27,7 @@ export function Zone({
     <section
       id={id}
       aria-labelledby={`${id}-heading`}
-      className={`relative scroll-mt-16 border-t border-border/70 px-6 py-20 md:px-12 md:py-28 lg:pr-[15rem] ${className}`}
+      className={`relative scroll-mt-24 border-t border-border/70 px-6 py-20 md:px-12 md:py-28 lg:pr-[15rem] ${className}`}
     >
       <header className="mb-12 md:mb-16">
         <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-4">
