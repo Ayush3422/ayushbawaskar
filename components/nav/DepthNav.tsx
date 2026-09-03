@@ -13,7 +13,7 @@ export function DepthNav() {
     >
       <div className="flex items-center justify-between px-6 py-3 md:px-12">
         <a href="#surface" className="font-display text-sm tracking-[0.3em]">
-          AYUSH<span style={{ color: "var(--signal)" }}> // </span>ABYSS
+          AYUSH<span style={{ color: "var(--signal)" }}>{" // "}</span>ABYSS
         </a>
         <ul className="hidden gap-6 md:flex">
           {ZONES.map((z) => (

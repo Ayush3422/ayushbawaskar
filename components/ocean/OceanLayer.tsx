@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { isOceanSupported } from "@/components/ui/fft-ocean-utils/gl";
 import { useDepth } from "@/components/depth/DepthProvider";
@@ -11,22 +11,34 @@ const FftOcean = dynamic(
   { ssr: false, loading: () => null },
 );
 
+/** Capability cannot change for the life of the page, so nothing to subscribe to. */
+const subscribe = () => () => {};
+
+let cached: boolean | null = null;
+const getSnapshot = () => {
+  if (cached === null) {
+    cached = isOceanSupported(document.createElement("canvas"));
+  }
+  return cached;
+};
+const getServerSnapshot = () => false;
+
 /**
  * One fixed canvas behind the whole page. Support is probed on a throwaway
- * canvas before the real one mounts, so an unsupported browser never sees a
- * black rectangle appear and then get replaced.
+ * canvas, so an unsupported browser never sees a black rectangle appear and
+ * then get replaced.
  */
 export function OceanLayer() {
   const { depth } = useDepth();
-  const [supported, setSupported] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setSupported(isOceanSupported(document.createElement("canvas")));
-  }, []);
+  const supported = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return (
     <div data-ocean-layer aria-hidden="true" className="fixed inset-0 -z-10">
-      {supported === true ? <FftOcean depth={depth} /> : <OceanFallback />}
+      {supported ? <FftOcean depth={depth} /> : <OceanFallback />}
     </div>
   );
 }

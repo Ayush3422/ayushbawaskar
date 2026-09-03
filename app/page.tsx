@@ -2,6 +2,7 @@ import { DepthProvider } from "@/components/depth/DepthProvider";
 import { DepthNav } from "@/components/nav/DepthNav";
 import { DiveComputer } from "@/components/hud/DiveComputer";
 import { OceanLayer } from "@/components/ocean/OceanLayer";
+import { MarineSnow } from "@/components/ocean/MarineSnow";
 import { Zone } from "@/components/zones/Zone";
 import { SonarScope } from "@/components/sonar/SonarScope";
 import { About } from "@/components/zones/About";
@@ -21,6 +22,7 @@ export default function Page() {
       </a>
 
       <OceanLayer />
+      <MarineSnow />
 
       {/* Light falling off with depth. Alpha is written by DepthProvider. */}
       <div
