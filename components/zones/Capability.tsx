@@ -1,9 +1,10 @@
 "use client";
 
 import { MAX_DEPTH } from "@/lib/depth";
-import { skills, skillGroups } from "@/data/skills";
+import { skills } from "@/data/skills";
 import { projects } from "@/data/projects";
-import { Label, Panel, PixelRule, Stamp, TagMatrix } from "@/components/ui/primitives";
+import { Label, Panel, PixelRule, Stamp } from "@/components/ui/primitives";
+import { Inventory } from "./Inventory";
 
 /** Axis gradations, in metres. */
 const TICKS = [0, 2000, 4000, 6000, 8000, 10000];
@@ -160,16 +161,7 @@ export function Capability() {
         </div>
       </div>
 
-      <div className="hard-shadow border-2 border-border bg-card/45 p-5">
-        <div className="mb-5 flex items-center gap-3">
-          <Stamp>Inventory</Stamp>
-          <div className="flex-1">
-            <PixelRule />
-          </div>
-          <Label>{skillGroups.length} groups</Label>
-        </div>
-        <TagMatrix groups={skillGroups} />
-      </div>
+      <Inventory />
     </div>
   );
 }

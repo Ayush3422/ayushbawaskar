@@ -65,57 +65,90 @@ export const skills: Skill[] = [
 ];
 
 /**
- * The same competences grouped for the inventory matrix. Every entry appears
- * because a repository on this page uses it — nothing aspirational.
+ * The inventory, grouped, with the project that put each item to work.
+ *
+ * `evidence` is a project slug, or "abyss" for this site. An item with no
+ * evidence is one used somewhere that is not on this page — coursework, or a
+ * repository that did not make the roster — and the UI says so rather than
+ * quietly implying a repository exists.
  */
-export const skillGroups: { category: string; items: string[] }[] = [
+export interface InventoryItem {
+  name: string;
+  evidence?: string;
+}
+
+export const skillGroups: { category: string; items: InventoryItem[] }[] = [
   {
     category: "Languages",
-    items: ["Python", "TypeScript", "JavaScript", "Solidity", "C"],
+    items: [
+      { name: "Python", evidence: "nostro" },
+      { name: "TypeScript", evidence: "abyss" },
+      { name: "JavaScript", evidence: "quantumchat" },
+      { name: "Solidity", evidence: "vortifi" },
+      { name: "C" },
+    ],
   },
   {
     category: "Applied ML",
     items: [
-      "XGBoost",
-      "scikit-learn",
-      "implicit / ALS",
-      "TF-IDF",
-      "SHAP",
-      "pandas",
-      "NumPy",
+      { name: "XGBoost", evidence: "energy-forecasting" },
+      { name: "scikit-learn", evidence: "booksense" },
+      { name: "implicit / ALS", evidence: "booksense" },
+      { name: "TF-IDF", evidence: "booksense" },
+      { name: "SHAP", evidence: "energy-forecasting" },
+      { name: "pandas", evidence: "nostro" },
+      { name: "NumPy", evidence: "nostro" },
     ],
   },
   {
     category: "Evaluation",
     items: [
-      "Held-out splits",
-      "Chronological splits",
-      "Precision@K · NDCG",
-      "Catalog coverage",
-      "Cold-start simulation",
-      "Scripted, reproducible reports",
+      { name: "Held-out splits", evidence: "nostro" },
+      { name: "Chronological splits", evidence: "energy-forecasting" },
+      { name: "Precision@K · NDCG", evidence: "booksense" },
+      { name: "Catalog coverage", evidence: "booksense" },
+      { name: "Cold-start simulation", evidence: "booksense" },
+      { name: "Scripted, reproducible reports", evidence: "nostro" },
     ],
   },
   {
     category: "Web",
     items: [
-      "React",
-      "Next.js",
-      "Tailwind CSS",
-      "Vite",
-      "Node.js",
-      "Express",
-      "WebSockets",
-      "WebGL2 / GLSL",
+      { name: "React", evidence: "vortifi" },
+      { name: "Next.js", evidence: "abyss" },
+      { name: "Tailwind CSS", evidence: "abyss" },
+      { name: "Vite" },
+      { name: "Node.js", evidence: "quantumchat" },
+      { name: "Express", evidence: "quantumchat" },
+      { name: "WebSockets", evidence: "quantumchat" },
+      { name: "WebGL2 / GLSL", evidence: "abyss" },
     ],
   },
   {
     category: "Blockchain",
-    items: ["Solidity", "Hardhat", "Hardhat Ignition", "ethers.js", "Ethereum"],
+    items: [
+      { name: "Solidity", evidence: "vortifi" },
+      { name: "Hardhat", evidence: "vortifi" },
+      { name: "Hardhat Ignition", evidence: "vortifi" },
+      { name: "ethers.js", evidence: "vortifi" },
+      { name: "Ethereum", evidence: "vortifi" },
+    ],
   },
   {
     category: "Cryptography",
-    items: ["AES-256-GCM", "Kyber KEM (simulated)", "Key exchange"],
+    items: [
+      { name: "AES-256-GCM", evidence: "quantumchat" },
+      { name: "Kyber KEM (simulated)", evidence: "quantumchat" },
+      { name: "Key exchange", evidence: "quantumchat" },
+    ],
   },
-  { category: "Tools", items: ["Git", "VS Code", "Google Colab", "Vercel"] },
+  {
+    category: "Tools",
+    items: [
+      { name: "Git" },
+      { name: "VS Code" },
+      { name: "Google Colab" },
+      { name: "Vercel", evidence: "abyss" },
+    ],
+  },
 ];
