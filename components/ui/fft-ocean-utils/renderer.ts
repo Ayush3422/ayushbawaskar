@@ -29,6 +29,8 @@ const N = 256;
 /** Patch size in metres. */
 const L = 512;
 const GRID_SEGMENTS = 255;
+/** The wave patch is repeated this many times per axis to push the horizon out. */
+const TILES = 3;
 const CHOPPINESS = 1.1;
 
 const SPECTRUM = {
@@ -284,8 +286,8 @@ export function createRenderer({
       const below = currentDepth > SURFACE_CROSSING ? 1 : 0;
       const darkness = Math.min(currentDepth / FULL_DARK, 1);
 
-      const eye: [number, number, number] = [0, eyeY, 150];
-      const view = lookAt(eye, [0, eyeY - 8, 0], [0, 1, 0]);
+      const eye: [number, number, number] = [0, eyeY, 120];
+      const view = lookAt(eye, [0, eyeY - 10, -260], [0, 1, 0]);
       const proj = perspective(
         (55 * Math.PI) / 180,
         Math.max(w / Math.max(h, 1), 0.0001),
@@ -304,7 +306,8 @@ export function createRenderer({
         false,
         viewProj,
       );
-      g.uniform1f(g.getUniformLocation(pOcean, "u_patch"), L);
+      g.uniform1f(g.getUniformLocation(pOcean, "u_patch"), L * TILES);
+      g.uniform1f(g.getUniformLocation(pOcean, "u_tiles"), TILES);
       g.uniform3f(g.getUniformLocation(pOcean, "u_camera"), eye[0], eye[1], eye[2]);
       g.uniform1f(g.getUniformLocation(pOcean, "u_below"), below);
       g.uniform1f(g.getUniformLocation(pOcean, "u_darkness"), darkness);

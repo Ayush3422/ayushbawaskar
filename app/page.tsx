@@ -1,6 +1,6 @@
 import { DepthProvider } from "@/components/depth/DepthProvider";
 import { DepthNav } from "@/components/nav/DepthNav";
-import { OceanFallback } from "@/components/ocean/OceanFallback";
+import { OceanLayer } from "@/components/ocean/OceanLayer";
 import { Zone } from "@/components/zones/Zone";
 import { profile } from "@/data/profile";
 
@@ -14,9 +14,7 @@ export default function Page() {
         Skip to content
       </a>
 
-      <div aria-hidden="true" className="fixed inset-0 -z-10">
-        <OceanFallback />
-      </div>
+      <OceanLayer />
 
       {/* Light falling off with depth. Alpha is written by DepthProvider. */}
       <div
