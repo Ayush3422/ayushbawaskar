@@ -37,7 +37,7 @@ export function ContactCard({
       data-contact={project.slug}
       onClick={() => onSelect(project)}
       aria-label={`${project.name}, ${project.domain}, range ${project.range.toLocaleString("en-US")} metres`}
-      className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card/45 text-left transition-colors hover:border-[var(--signal)]"
+      className="group hard-shadow flex h-full flex-col border-2 border-border bg-card/55 text-left transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-[var(--signal)] hover:shadow-[8px_8px_0_0_var(--signal)]"
     >
       <div
         className="flex items-center justify-between px-4 py-2 font-mono text-[10px] tracking-[0.22em] uppercase"
@@ -73,7 +73,7 @@ export function ContactCard({
         </p>
 
         {/* Real measurements from the repository, never a rating out of 100. */}
-        <dl className="mt-5 grid grid-cols-2 overflow-hidden rounded border border-border">
+        <dl className="mt-5 grid grid-cols-2 border-2 border-border">
           {cells.map((m, i) => {
             // An odd final metric spans the full width. Leaving a bordered
             // empty cell instead reads as a rendering fault, not a layout.

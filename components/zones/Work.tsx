@@ -56,7 +56,7 @@ export function Work() {
             limitation, the card says so on its face.
           </p>
 
-          <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-border pt-4">
+          <dl className="mt-6 grid grid-cols-3 gap-4 border-t-2 border-border pt-4">
             <div>
               <dt>
                 <Label>Deepest</Label>
@@ -84,7 +84,7 @@ export function Work() {
       </div>
 
       <div>
-        <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-border pb-4">
+        <div className="mb-6 flex flex-wrap items-center gap-2 border-b-2 border-border pb-4">
           {sectors.map(([name, count]) => {
             const on = filter === name;
             return (
@@ -93,7 +93,7 @@ export function Work() {
                 type="button"
                 onClick={() => setFilter(name)}
                 aria-pressed={on}
-                className="rounded border px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors"
+                className="border-2 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] uppercase transition-colors"
                 style={
                   on
                     ? {

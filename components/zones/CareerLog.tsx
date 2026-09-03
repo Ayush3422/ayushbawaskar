@@ -6,12 +6,12 @@ export function CareerLog() {
   return (
     <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-16">
       <div>
-        <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+        <div className="mb-4 flex items-baseline justify-between gap-4 border-b-2 border-border pb-2">
           <Label>Log</Label>
           <Label>{timeline.length} entries</Label>
         </div>
 
-        <ol className="border-l border-border pl-6">
+        <ol className="border-l-2 border-border pl-6">
           {timeline.map((t) => (
             <li
               key={t.when + t.title}
@@ -33,14 +33,14 @@ export function CareerLog() {
           ))}
         </ol>
 
-        <p className="mt-8 border-t border-border pt-4 font-mono text-[10px] leading-relaxed tracking-[0.12em] text-muted-foreground/70 uppercase">
+        <p className="mt-8 border-t-2 border-border pt-4 font-mono text-[10px] leading-relaxed tracking-[0.12em] text-muted-foreground/70 uppercase">
           Entries appear only where there is a repository, an institution or a
           named event behind them.
         </p>
       </div>
 
       <div>
-        <div className="mb-4 border-b border-border pb-2">
+        <div className="mb-4 border-b-2 border-border pb-2">
           <Label>Working rules</Label>
         </div>
 

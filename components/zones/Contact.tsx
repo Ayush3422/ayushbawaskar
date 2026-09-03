@@ -9,7 +9,7 @@ export function Contact() {
           Let&apos;s <span style={{ color: "var(--signal)" }}>talk</span>
         </h3>
 
-        <div className="rounded-lg border border-border bg-card/35 p-5">
+        <div className="hard-shadow relative border-2 border-border bg-card/55 p-5">
           <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-border pb-2">
             <Label>Dive complete</Label>
             <Label>11,034 m</Label>
@@ -44,7 +44,7 @@ export function Contact() {
             <div className="mb-4">
               <Label>Reach me</Label>
             </div>
-            <ul className="divide-y divide-border border-y border-border">
+            <ul className="divide-y-2 divide-border border-y-2 border-border">
               {profile.links.map((l) => (
                 <li
                   key={l.href}
@@ -114,7 +114,7 @@ export function Contact() {
         </div>
       </div>
 
-      <p className="border-t border-border pt-8 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+      <p className="border-t-2 border-border pt-8 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
         11,034 m · Challenger Deep · you have reached the bottom
       </p>
     </div>

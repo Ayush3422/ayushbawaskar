@@ -20,17 +20,52 @@ export function Label({
   );
 }
 
-/** A bordered chip. Used in dozens at a time to fill a row with real facts. */
+/** A hard-edged chip. Used in dozens at a time to fill a row with real facts. */
 export function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-block rounded border border-border bg-card/40 px-2 py-1 font-mono text-[11px] text-foreground/85">
+    <span className="inline-block border border-border bg-card/60 px-2 py-1 font-mono text-[11px] text-foreground/85">
+      {children}
+    </span>
+  );
+}
+
+/** A rule made of squares rather than a hairline. */
+export function PixelRule({ signal = false }: { signal?: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={signal ? "pixel-rule-signal" : "pixel-rule"}
+    />
+  );
+}
+
+/**
+ * Inverted solid block. Used for plate numbers and section markers — the
+ * brutalist move of stamping a label rather than setting it quietly.
+ */
+export function Stamp({
+  children,
+  signal = false,
+}: {
+  children: ReactNode;
+  signal?: boolean;
+}) {
+  return (
+    <span
+      className="inline-block px-2.5 py-1 font-mono text-[10px] tracking-[0.22em] uppercase"
+      style={
+        signal
+          ? { background: "var(--signal)", color: "#0a0a0a" }
+          : { background: "var(--foreground)", color: "#0a0a0a" }
+      }
+    >
       {children}
     </span>
   );
 }
 
 /**
- * Label/value rows with hairline rules — the "spec sheet". Turns scattered
+ * Label/value rows with heavy rules — the "spec sheet". Turns scattered
  * biographical facts into one dense, scannable block.
  */
 export function SpecSheet({
@@ -39,7 +74,7 @@ export function SpecSheet({
   rows: { label: string; value: ReactNode }[];
 }) {
   return (
-    <dl className="divide-y divide-border border-y border-border">
+    <dl className="divide-y-2 divide-border border-y-2 border-border">
       {rows.map((r) => (
         <div
           key={r.label}
@@ -65,7 +100,7 @@ export function TagMatrix({
   groups: { category: string; items: string[] }[];
 }) {
   return (
-    <div className="divide-y divide-border border-y border-border">
+    <div className="divide-y-2 divide-border border-y-2 border-border">
       {groups.map((g) => (
         <div
           key={g.category}
@@ -83,22 +118,34 @@ export function TagMatrix({
   );
 }
 
-/** A bordered panel with its own label — the unit the instrument columns are built from. */
+/**
+ * A bordered panel with its own stamped label. 2px border and a solid offset
+ * block behind it — no blur, no alpha, just a second rectangle.
+ */
 export function Panel({
   label,
   children,
   className = "",
+  signal = false,
+  ticks = false,
 }: {
   label: string;
   children: ReactNode;
   className?: string;
+  signal?: boolean;
+  ticks?: boolean;
 }) {
   return (
     <section
-      className={`rounded-lg border border-border bg-card/35 p-5 ${className}`}
+      className={`relative border-2 border-border bg-card/55 p-5 ${
+        signal ? "hard-shadow-signal" : "hard-shadow"
+      } ${ticks ? "corner-ticks" : ""} ${className}`}
     >
-      <header className="mb-4 border-b border-border pb-2">
-        <Label>{label}</Label>
+      <header className="mb-4 flex items-center gap-3">
+        <Stamp signal={signal}>{label}</Stamp>
+        <div className="flex-1">
+          <PixelRule signal={signal} />
+        </div>
       </header>
       {children}
     </section>
@@ -118,7 +165,7 @@ export function Stat({
   signal?: boolean;
 }) {
   return (
-    <div className="border-l border-border pl-4">
+    <div className="border-l-2 border-border pl-4">
       <div
         className="font-mono text-2xl tabular-nums md:text-3xl"
         style={signal ? { color: "var(--signal)" } : undefined}

@@ -10,7 +10,7 @@ export function DepthNav() {
   return (
     <nav
       aria-label="Depth zones"
-      className="fixed inset-x-0 top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur"
+      className="fixed inset-x-0 top-0 z-40 border-b-2 border-border bg-background/85 backdrop-blur"
     >
       <div className="flex h-[4.5rem] items-center justify-between gap-6 px-6 md:px-12">
         <a

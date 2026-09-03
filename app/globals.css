@@ -91,7 +91,8 @@
   --chart-4: #525252;
   --chart-5: #404040;
 
-  --radius: 0.5rem;
+  /* Brutalist: no soft corners anywhere, shadcn primitives included. */
+  --radius: 0rem;
 
   --sidebar: #141414;
   --sidebar-foreground: #fafafa;
@@ -178,4 +179,91 @@
   100% {
     background: var(--muted-foreground);
   }
+}
+
+/*
+ * Pixel and brutalist utilities.
+ * Kept as plain CSS rather than Tailwind arbitrary values because each one is
+ * used in a dozen places and the declarations are long.
+ */
+
+/* 2px checkerboard. Reads as dither/halftone at a distance. */
+.dither {
+  background-image:
+    linear-gradient(45deg, rgba(250, 250, 250, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(250, 250, 250, 0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(250, 250, 250, 0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(250, 250, 250, 0.05) 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 0 2px, 2px -2px, -2px 0;
+}
+
+.dither-signal {
+  background-image:
+    linear-gradient(45deg, color-mix(in srgb, var(--signal) 22%, transparent) 25%, transparent 25%),
+    linear-gradient(-45deg, color-mix(in srgb, var(--signal) 22%, transparent) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, color-mix(in srgb, var(--signal) 22%, transparent) 75%),
+    linear-gradient(-45deg, transparent 75%, color-mix(in srgb, var(--signal) 22%, transparent) 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+}
+
+/* A rule made of squares instead of a continuous hairline. */
+.pixel-rule {
+  height: 3px;
+  background-image: linear-gradient(
+    to right,
+    var(--border) 0 3px,
+    transparent 3px 6px
+  );
+  background-size: 6px 3px;
+  background-repeat: repeat-x;
+}
+
+.pixel-rule-signal {
+  height: 3px;
+  background-image: linear-gradient(
+    to right,
+    var(--signal) 0 3px,
+    transparent 3px 6px
+  );
+  background-size: 6px 3px;
+  background-repeat: repeat-x;
+}
+
+/*
+ * Offset solid block behind a panel — the brutalist "hard shadow". No blur,
+ * no alpha; it is a second rectangle, and it says so.
+ */
+.hard-shadow {
+  box-shadow: 6px 6px 0 0 var(--border);
+}
+
+.hard-shadow-signal {
+  box-shadow: 6px 6px 0 0 var(--signal);
+}
+
+/* Exposed corner ticks, like a crop mark on a printer proof. */
+.corner-ticks::before,
+.corner-ticks::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--signal);
+  pointer-events: none;
+}
+
+.corner-ticks::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.corner-ticks::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
 }

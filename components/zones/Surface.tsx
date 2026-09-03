@@ -27,7 +27,7 @@ export function Surface() {
           style={{ background: "var(--signal)" }}
         />
         <Label>{profile.status}</Label>
-        <span className="rounded border border-border px-2 py-1 font-mono text-[10px] tracking-[0.2em] uppercase">
+        <span className="border-2 border-border px-2 py-1 font-mono text-[10px] tracking-[0.2em] uppercase">
           {profile.location}
         </span>
       </div>
@@ -59,14 +59,14 @@ export function Surface() {
 
         <nav
           aria-label="Dive plan"
-          className="rounded-lg border border-border bg-card/35 p-5"
+          className="hard-shadow corner-ticks relative border-2 border-border bg-card/55 p-5"
         >
           <div className="mb-3 flex items-baseline justify-between gap-4 border-b border-border pb-2">
             <Label>Dive plan</Label>
             <Label>6 zones</Label>
           </div>
 
-          <ol className="divide-y divide-border">
+          <ol className="divide-y-2 divide-border">
             {ZONES.map((z, i) => (
               <li key={z.id}>
                 <a
@@ -95,7 +95,7 @@ export function Surface() {
       </div>
 
       {/* Four figures, each restated with its source further down the page. */}
-      <dl className="mt-16 grid grid-cols-2 gap-y-8 border-t border-border pt-10 md:grid-cols-4">
+      <dl className="mt-16 grid grid-cols-2 gap-y-8 border-t-2 border-border pt-10 md:grid-cols-4">
         {headlineStats.map((s) => (
           <Stat
             key={s.label}

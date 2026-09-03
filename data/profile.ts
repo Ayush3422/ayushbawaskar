@@ -5,6 +5,9 @@ export const profile: Profile = {
   heroLine: "I hold the data out before I believe the number.",
   role: "Applied ML · Blockchain · Systems",
   status: "Open to internships — applied ML, data, or backend",
+  // Pulled out as the section's statement band, so it is not also in `about`.
+  statement:
+    "I build machine-learning systems, then try to find the number that proves they do not work.",
   location: "Ahmedabad, India",
   education: [
     {
@@ -28,7 +31,7 @@ export const profile: Profile = {
   ],
   interests: ["Cricket", "Strategy and FPS games", "Hackathons"],
   about: [
-    "I build machine-learning systems and then try to find the number that proves they do not work. Most of what I have learned came from that second step: holding data out before fitting anything to it, splitting time series chronologically instead of at random, and tracking catalog coverage next to precision so a model cannot win by hiding behind whatever is already popular.",
+    "Most of what I have learned came from that second step: holding data out before fitting anything to it, splitting time series chronologically instead of at random, and tracking catalog coverage next to precision so a model cannot win by hiding behind whatever is already popular.",
     "That habit is why the reconciliation engine below reports a held-out precision of 0.9937 next to an in-sample 0.9905, rather than only the flattering one, and why its match rate is scoped to the side of the join that can actually be held out. It is why the load forecaster is split chronologically — shuffling that data lets lag features carry the future into training — and why its worst residuals, on the hottest 5% of hours, are on the card instead of hidden behind an average.",
     "The rest of the work spans a Solidity voting contract and an educational post-quantum messaging prototype. Every result on this page was produced by a script inside the repository it links to, and where a project has a limitation, the limitation is stated on the card rather than left for someone else to find.",
   ],

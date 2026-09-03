@@ -17,12 +17,12 @@ export function Capability() {
     <div data-testid="capability-sounding" className="space-y-16">
       <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:gap-16">
         <div>
-          <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+          <div className="mb-4 flex items-baseline justify-between gap-4 border-b-2 border-border pb-2">
             <Label>Sounding line</Label>
             <Label>{sorted.length} entries</Label>
           </div>
 
-          <ol className="relative border-l border-border pl-6">
+          <ol className="relative border-l-2 border-border pl-6">
             {sorted.map((s) => (
               <li
                 key={s.name}
@@ -92,7 +92,7 @@ export function Capability() {
       </div>
 
       <div>
-        <div className="mb-4 border-b border-border pb-2">
+        <div className="mb-4 border-b-2 border-border pb-2">
           <Label>Inventory</Label>
         </div>
         <TagMatrix groups={skillGroups} />
