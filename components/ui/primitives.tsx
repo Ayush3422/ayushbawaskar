@@ -23,7 +23,7 @@ export function Label({
 /** A hard-edged chip. Used in dozens at a time to fill a row with real facts. */
 export function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-block border border-border bg-card/60 px-2 py-1 font-mono text-[11px] text-foreground/85">
+    <span className="inline-block border border-border bg-card/60 px-2 py-1 font-mono text-[11px] text-foreground/85 transition-colors hover:border-[var(--signal)] hover:text-foreground">
       {children}
     </span>
   );
@@ -99,21 +99,55 @@ export function TagMatrix({
 }: {
   groups: { category: string; items: string[] }[];
 }) {
+  const total = groups.reduce((n, g) => n + g.items.length, 0);
+  const widest = Math.max(...groups.map((g) => g.items.length));
+
   return (
     <div className="divide-y-2 divide-border border-y-2 border-border">
       {groups.map((g) => (
         <div
           key={g.category}
-          className="grid gap-3 py-4 sm:grid-cols-[7.5rem_1fr] sm:gap-4"
+          className="grid gap-3 py-4 sm:grid-cols-[8rem_1fr_5.5rem] sm:items-start sm:gap-5"
         >
-          <Label className="pt-1">{g.category}</Label>
+          <Label className="pt-1.5">{g.category}</Label>
+
           <div className="flex flex-wrap gap-1.5">
             {g.items.map((i) => (
               <Chip key={i}>{i}</Chip>
             ))}
           </div>
+
+          {/*
+           * Count and proportion. Short rows previously trailed off into a
+           * thousand pixels of nothing; this closes the row and says something
+           * about it at the same time.
+           */}
+          <div className="hidden pt-1.5 sm:block">
+            <div className="flex items-center justify-end gap-2">
+              <span
+                aria-hidden="true"
+                className="h-[2px] bg-border"
+                style={{ width: `${(g.items.length / widest) * 2.5}rem` }}
+              />
+              <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                {String(g.items.length).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
         </div>
       ))}
+
+      <div className="grid gap-3 py-4 sm:grid-cols-[8rem_1fr_5.5rem] sm:gap-5">
+        <Label>Total</Label>
+        <p className="font-mono text-[11px] leading-relaxed text-muted-foreground/70">
+          The inventory is everything reached for. The sounding line above is
+          only what a project pushed hard enough to prove — which is why Git and
+          an editor appear here and not there.
+        </p>
+        <span className="hidden text-right font-mono text-[11px] tabular-nums sm:block">
+          {total}
+        </span>
+      </div>
     </div>
   );
 }

@@ -160,12 +160,13 @@ export function Capability() {
         </div>
       </div>
 
-      <div>
-        <div className="mb-4 flex items-center gap-3">
+      <div className="hard-shadow border-2 border-border bg-card/45 p-5">
+        <div className="mb-5 flex items-center gap-3">
           <Stamp>Inventory</Stamp>
           <div className="flex-1">
             <PixelRule />
           </div>
+          <Label>{skillGroups.length} groups</Label>
         </div>
         <TagMatrix groups={skillGroups} />
       </div>
