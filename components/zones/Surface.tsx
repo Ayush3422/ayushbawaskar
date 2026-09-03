@@ -22,17 +22,6 @@ export function Surface() {
       aria-labelledby="surface-heading"
       className="relative flex min-h-[92vh] scroll-mt-24 flex-col justify-center px-6 py-24 md:px-12 lg:pr-[15rem]"
     >
-      {/* Scrim. The swell is bright enough at the surface that muted labels
-          lose contrast against it; this keeps the type readable without
-          flattening the water. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-[1]"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(10,10,10,0.82) 0%, rgba(10,10,10,0.45) 40%, rgba(10,10,10,0.78) 100%)",
-        }}
-      />
       {/* Availability and location, the two things a recruiter looks for first. */}
       <div
         className="rise mb-10 flex flex-wrap items-center gap-x-4 gap-y-3"

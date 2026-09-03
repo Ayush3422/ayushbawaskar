@@ -24,6 +24,21 @@ export default function Page() {
       <OceanLayer />
       <MarineSnow />
 
+      {/*
+       * Near-surface scrim. It has to be fixed and full-viewport like the
+       * ocean it sits over — bounded to the hero section it produced a hard
+       * brightness step at the section edge, where unscrimmed water resumed.
+       */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-[7]"
+        style={{
+          opacity: "var(--surface-scrim)",
+          background:
+            "linear-gradient(to bottom, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.5) 45%, rgba(10,10,10,0.8) 100%)",
+        }}
+      />
+
       {/* Light falling off with depth. Alpha is written by DepthProvider. */}
       <div
         aria-hidden="true"

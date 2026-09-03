@@ -120,6 +120,12 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
       root.setProperty("--depth-veil", depthToVeil(depth).toFixed(4));
       root.setProperty("--snow-density", depthToSnowDensity(depth).toFixed(4));
       root.setProperty("--depth-tint", (1 - depth / MAX_DEPTH).toFixed(4));
+      // Near-surface scrim. The swell is brightest here and the depth veil has
+      // barely started, so this covers the gap between them.
+      root.setProperty(
+        "--surface-scrim",
+        Math.max(0, 1 - depth / 400).toFixed(4),
+      );
 
       // React state, by contrast, re-renders every consumer. Commit only when a
       // value someone actually displays has changed: whole metres of depth,
