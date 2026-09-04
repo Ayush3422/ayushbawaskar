@@ -6,30 +6,51 @@ import { useDepth } from "@/components/depth/DepthProvider";
 
 const STORAGE_KEY = "abyss:ambience";
 
-/** Any of these counts as the gesture browsers demand before audio may start. */
-const GESTURES = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+/**
+ * Events that actually grant user activation. Wheel and scroll do not — a
+ * mouse-wheel scroll leaves navigator.userActivation.isActive false, so audio
+ * started from one is still refused. Listening for them only produced attempts
+ * that were always going to fail.
+ */
+const GESTURES = [
+  "pointerdown",
+  "pointerup",
+  "click",
+  "keydown",
+  "keyup",
+  "touchend",
+] as const;
 
 /**
  * Ambience: the supplied wave recording, routed through a depth-driven lowpass
  * so it muffles as you descend — 4.2 kHz of surf at the surface down to 320 Hz
  * at the trench floor.
  *
- * On by default, but it cannot literally autoplay: every current browser
- * refuses audio that starts without a user gesture, and an attempt is rejected
- * rather than delayed. So it tries immediately, and if refused it arms itself
- * to start on the visitor's first scroll, click or keypress — which on a page
- * whose first instruction is "scroll to descend" is a second or two away.
+ * On by default. It cannot literally autoplay — every current browser refuses
+ * audio that begins without a user gesture — so it tries immediately and, when
+ * refused, retries on the visitor's first scroll, click or keypress.
  *
- * Turning it off is remembered, and a visitor who has turned it off is never
- * asked again.
+ * Structured as a reconciler around one desired state rather than as two things
+ * that each start and stop playback. An earlier version let the auto-start
+ * listeners and the toggle both mutate it with awaits in between: a refused
+ * attempt parks on ctx.resume() until a gesture arrives, so clicking the toggle
+ * resolved several stale attempts at once and whether the click turned the
+ * sound on or off came down to which promise settled first.
  */
 export function Ambience() {
   const { depth } = useDepth();
   const [on, setOn] = useState(false);
 
+  /** What the visitor wants. The only thing that decides playback. */
+  const desiredRef = useRef(false);
+  /** Set once the visitor uses the toggle; auto-start stops trying after that. */
+  const decidedRef = useRef(false);
+  const applyingRef = useRef(false);
+  const pendingRef = useRef(false);
+  const playingRef = useRef(false);
+
   const ctxRef = useRef<AudioContext | null>(null);
   const filterRef = useRef<BiquadFilterNode | null>(null);
-  const masterRef = useRef<GainNode | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const teardown = useCallback(() => {
@@ -41,15 +62,11 @@ export function Ambience() {
     void ctxRef.current?.close();
     ctxRef.current = null;
     filterRef.current = null;
-    masterRef.current = null;
+    playingRef.current = false;
   }, []);
 
-  /**
-   * Builds the graph on first call and resumes it on later ones, so a refused
-   * attempt can simply be retried on the next gesture without leaking a second
-   * AudioContext. Resolves to whether sound is actually playing.
-   */
-  const start = useCallback(async (): Promise<boolean> => {
+  /** Builds the graph once, then resumes and plays. Never throws. */
+  const play = useCallback(async (fromGesture: boolean): Promise<boolean> => {
     if (!ctxRef.current) {
       const Ctx =
         window.AudioContext ||
@@ -61,16 +78,11 @@ export function Ambience() {
       const master = ctx.createGain();
       master.gain.value = 0.0001;
       master.connect(ctx.destination);
-      masterRef.current = master;
-      // Ease in, so arriving on the page is not a slap.
-      master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.8);
 
       const el = new Audio("/audio/ocean-waves.mp3");
       el.loop = true;
       el.preload = "auto";
       audioRef.current = el;
-
-      const source = ctx.createMediaElementSource(el);
 
       const filter = ctx.createBiquadFilter();
       filter.type = "lowpass";
@@ -81,22 +93,81 @@ export function Ambience() {
       const waterGain = ctx.createGain();
       waterGain.gain.value = 0.9;
 
-      source.connect(filter).connect(waterGain).connect(master);
+      ctx
+        .createMediaElementSource(el)
+        .connect(filter)
+        .connect(waterGain)
+        .connect(master);
+
+      // Ease in, so arriving on the page is not a slap.
+      master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.8);
     }
 
     const ctx = ctxRef.current;
     const el = audioRef.current;
     if (!ctx || !el) return false;
 
+    if (ctx.state !== "running") {
+      /*
+       * Only ever resume from inside a real gesture. resume() does not reject
+       * without user activation, it simply never settles — awaiting it
+       * speculatively parked attempts that all resolved at once on the first
+       * click, and the toggle then raced them. Outside a gesture, give up
+       * immediately and wait to be called again.
+       */
+      if (!fromGesture) return false;
+      try {
+        await ctx.resume();
+      } catch {
+        return false;
+      }
+      if (ctxRef.current?.state !== "running") return false;
+    }
+
     try {
-      if (ctx.state === "suspended") await ctx.resume();
       await el.play();
       return !el.paused;
     } catch {
-      // Refused. The caller will try again on the next gesture.
+      // Refused. A later gesture will get another go.
       return false;
     }
   }, []);
+
+  /**
+   * Drives playback to whatever desiredRef says. Serialised, and re-checked
+   * after the await, so a desire that flips mid-flight always wins.
+   */
+  const apply = useCallback(async (fromGesture = false) => {
+    /*
+     * Overlapping requests are remembered, not dropped. Returning early here
+     * meant a toggle that arrived while an auto-start attempt was still in
+     * flight did nothing at all — the click looked broken. The loop re-runs
+     * until the desired state and the real state agree, so the last request
+     * always wins.
+     */
+    if (applyingRef.current) {
+      pendingRef.current = true;
+      return;
+    }
+    applyingRef.current = true;
+    try {
+      do {
+        pendingRef.current = false;
+
+        if (desiredRef.current) {
+          const ok = await play(fromGesture);
+          if (!desiredRef.current) continue;
+          playingRef.current = ok;
+          setOn(ok);
+        } else {
+          teardown();
+          setOn(false);
+        }
+      } while (pendingRef.current);
+    } finally {
+      applyingRef.current = false;
+    }
+  }, [play, teardown]);
 
   // On by default, unless this visitor has said otherwise.
   useEffect(() => {
@@ -108,29 +179,30 @@ export function Ambience() {
     }
     if (optedOut) return;
 
-    let settled = false;
-    const detach = () => {
-      for (const e of GESTURES) window.removeEventListener(e, attempt);
-      window.removeEventListener("scroll", attempt);
+    desiredRef.current = true;
+
+    const onGesture = (event: Event) => {
+      // A gesture on the toggle is the toggle's business, not auto-start's.
+      if (
+        event.target instanceof Element &&
+        event.target.closest("[data-ambience]")
+      ) {
+        return;
+      }
+      if (decidedRef.current || playingRef.current) return;
+      void apply(true);
     };
 
-    async function attempt() {
-      if (settled) return;
-      const playing = await start();
-      if (!playing) return;
-      settled = true;
-      setOn(true);
-      detach();
-    }
-
-    void attempt();
+    // Optimistic: succeeds only where the browser already permits audio.
+    void apply(false);
     for (const e of GESTURES) {
-      window.addEventListener(e, attempt, { passive: true });
+      window.addEventListener(e, onGesture, { passive: true });
     }
-    window.addEventListener("scroll", attempt, { passive: true });
 
-    return detach;
-  }, [start]);
+    return () => {
+      for (const e of GESTURES) window.removeEventListener(e, onGesture);
+    };
+  }, [apply]);
 
   // Depth drives the filter while it is running.
   useEffect(() => {
@@ -144,24 +216,21 @@ export function Ambience() {
 
   useEffect(() => teardown, [teardown]);
 
-  const toggle = async () => {
-    if (on) {
-      teardown();
-      setOn(false);
-      try {
-        localStorage.setItem(STORAGE_KEY, "off");
-      } catch {
-        // Private mode. The toggle still works for this visit.
-      }
-      return;
-    }
-    const playing = await start();
-    setOn(playing);
+  const toggle = () => {
+    decidedRef.current = true;
+    /*
+     * Flip against what is actually audible, not against the intent flag.
+     * The flag is true from mount while the browser is still refusing to
+     * start, so flipping it made the visitor's first click "turn off"
+     * something they had never heard.
+     */
+    desiredRef.current = !playingRef.current;
     try {
-      localStorage.setItem(STORAGE_KEY, "on");
+      localStorage.setItem(STORAGE_KEY, desiredRef.current ? "on" : "off");
     } catch {
-      // As above.
+      // Private mode. The toggle still works for this visit.
     }
+    void apply(true);
   };
 
   return (

@@ -59,19 +59,24 @@ export function DepthNav() {
           })}
         </ul>
 
-        <div className="hidden lg:block">
-          <Ambience />
-        </div>
-
         {/* Below lg the zone list is replaced by where you currently are. */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:hidden">
-          <Ambience />
           <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
             {zone.label}
           </span>
-          <span className="rounded border border-border px-2 py-1 font-mono text-[11px] whitespace-nowrap tabular-nums">
+          <span className="border-2 border-border px-2 py-1 font-mono text-[11px] whitespace-nowrap tabular-nums">
             {Math.round(depth).toLocaleString("en-US")} m
           </span>
+        </div>
+
+        {/*
+         * One instance, at every width. Rendering it twice and hiding one with
+         * a breakpoint gave the page two Ambience components, each building its
+         * own AudioContext and audio element — so the visible button controlled
+         * only half of what had been created.
+         */}
+        <div className="shrink-0">
+          <Ambience />
         </div>
       </div>
 
