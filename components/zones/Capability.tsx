@@ -22,7 +22,10 @@ export function Capability() {
   return (
     <div data-testid="capability-sounding" className="space-y-16">
       <div className="grid gap-10 lg:grid-cols-[1.45fr_1fr] lg:items-start">
-        <div className="hard-shadow border-2 border-border bg-card/45 p-5">
+        {/* min-w-0: a grid item defaults to min-width:auto, so without it this
+            panel grows to fit the scrolling chart inside it instead of
+            constraining it, and the whole page gains a horizontal scrollbar. */}
+        <div className="hard-shadow min-w-0 border-2 border-border bg-card/45 p-5">
           <div className="mb-5 flex items-center gap-3">
             <Stamp>Sounding line</Stamp>
             <div className="flex-1">
@@ -36,6 +39,14 @@ export function Capability() {
            * no scale beside it, so the indent carried no meaning a reader could
            * decode — it just looked like ragged text.
            */}
+          {/*
+           * The chart scrolls inside its own container on narrow screens. Its
+           * depth labels are absolutely positioned and nowrap, so at 390px they
+           * ran 95px past the viewport and gave the whole page a horizontal
+           * scrollbar.
+           */}
+          <div className="-mx-1 overflow-x-auto px-1 pb-2">
+          <div className="min-w-[34rem]">
           <div className="grid grid-cols-[9rem_1fr] gap-3 sm:grid-cols-[13.5rem_1fr] sm:gap-4">
             <div />
             <div className="relative mb-2 h-4">
@@ -104,6 +115,8 @@ export function Capability() {
               </li>
             ))}
           </ol>
+          </div>
+          </div>
 
           <p className="mt-5 border-t-2 border-border pt-4 font-mono text-[10px] leading-relaxed tracking-[0.12em] text-muted-foreground/70 uppercase">
             Bar length is the depth of the deepest project that used it. Nothing

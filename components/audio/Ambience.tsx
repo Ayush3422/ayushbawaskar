@@ -72,9 +72,32 @@ export function Ambience() {
         window.AudioContext ||
         (window as unknown as { webkitAudioContext: typeof AudioContext })
           .webkitAudioContext;
-      const ctx = new Ctx();
-      ctxRef.current = ctx;
+      ctxRef.current = new Ctx();
+    }
+    const ctx = ctxRef.current;
 
+    if (ctx.state !== "running") {
+      /*
+       * Only ever resume from inside a real gesture. resume() does not reject
+       * without user activation, it simply never settles — awaiting it
+       * speculatively parked attempts that all resolved at once on the first
+       * click, and the toggle then raced them.
+       */
+      if (!fromGesture) return false;
+      try {
+        await ctx.resume();
+      } catch {
+        return false;
+      }
+      if (ctxRef.current?.state !== "running") return false;
+    }
+
+    /*
+     * The media graph is built here, after we know playback can actually
+     * start. Building it up front meant a 4.5 MB preload="auto" fetch on every
+     * page load, for a sound most visitors would never hear.
+     */
+    if (!audioRef.current) {
       const master = ctx.createGain();
       master.gain.value = 0.0001;
       master.connect(ctx.destination);
@@ -103,26 +126,8 @@ export function Ambience() {
       master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.8);
     }
 
-    const ctx = ctxRef.current;
     const el = audioRef.current;
-    if (!ctx || !el) return false;
-
-    if (ctx.state !== "running") {
-      /*
-       * Only ever resume from inside a real gesture. resume() does not reject
-       * without user activation, it simply never settles — awaiting it
-       * speculatively parked attempts that all resolved at once on the first
-       * click, and the toggle then raced them. Outside a gesture, give up
-       * immediately and wait to be called again.
-       */
-      if (!fromGesture) return false;
-      try {
-        await ctx.resume();
-      } catch {
-        return false;
-      }
-      if (ctxRef.current?.state !== "running") return false;
-    }
+    if (!el) return false;
 
     try {
       await el.play();

@@ -166,7 +166,9 @@ export function SonarScope({
               }
             />
             <span
-              className="pointer-events-none absolute top-1/2 -translate-y-1/2 font-mono text-[10px] tracking-[0.15em] whitespace-nowrap uppercase transition-colors group-hover:text-foreground"
+              /* Hidden on narrow screens: the labels are nowrap and overran the
+                 viewport. The card grid below names every contact anyway. */
+              className="pointer-events-none absolute top-1/2 hidden -translate-y-1/2 font-mono text-[10px] tracking-[0.15em] whitespace-nowrap uppercase transition-colors group-hover:text-foreground sm:block"
               style={{
                 color: isActive ? "var(--signal)" : "var(--muted-foreground)",
                 ...(leftOfCentre
