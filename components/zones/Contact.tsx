@@ -1,6 +1,7 @@
 import { profile, colophon } from "@/data/profile";
 import { Label, Panel, PixelRule, SpecSheet, Stamp } from "@/components/ui/primitives";
 import { iconFor } from "@/components/ui/icons";
+import { RepoManifest } from "@/components/manifest/RepoManifest";
 
 export function Contact() {
   return (
@@ -144,6 +145,10 @@ export function Contact() {
           </p>
         </div>
       </div>
+
+      {/* Directly under the instruction, so the reader can act on it without
+          leaving the page first. */}
+      <RepoManifest />
 
       <div className="border-t-2 border-border pt-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_auto_auto] lg:items-end">
