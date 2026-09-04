@@ -1,9 +1,14 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { depthSignal } from "@/lib/depthSignal";
+
+/** Start fetching a little before it is due to appear at 200 m. */
+const PRELOAD_DEPTH = 120;
 
 /**
- * A rotating bust built out of the Res Gestae Divi Augustus, drifting behind
+ * A rotating bust built out of the Res Gestae Divi Augusti, drifting behind
  * the middle of the descent.
  *
  * One fixed layer rather than three copies. It is wanted in Twilight, Midnight
@@ -16,13 +21,34 @@ import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
  * black, so screen drops the black entirely and leaves only the lettering — no
  * visible frame, no box, just the sculpture suspended in the water.
  *
- * 97 source frames at 13 MB became 49 frames in a 431 KB animated WebP: every
- * other frame at 760px. A full rotation survives the halving; the file size
- * does not. Encoded at 760 rather than 520 so it stays sharp at the size it is
- * actually drawn — upscaling the smaller file left it visibly soft.
+ * All 97 source frames at 25fps, 760px, in a 795 KB animated WebP. An earlier
+ * pass dropped every other frame to halve the file, which put the rotation at
+ * 12.5fps and made it judder — the saving was not worth the only thing this
+ * asset does. It is instead deferred until the reader is near the depth it
+ * appears at, so anyone who never leaves the hero never fetches it.
  */
 export function Relic() {
   const reduced = useReducedMotion();
+  const [near, setNear] = useState(false);
+  const raf = useRef(0);
+
+  useEffect(() => {
+    if (near) return;
+
+    const check = () => {
+      if (depthSignal.depth >= PRELOAD_DEPTH) {
+        // Latched: once fetched it stays, so drifting back up cannot unmount
+        // it and force the browser to load it again.
+        setNear(true);
+        return;
+      }
+      raf.current = requestAnimationFrame(check);
+    };
+    raf.current = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(raf.current);
+  }, [near]);
+
+  if (!near) return null;
 
   return (
     <div
