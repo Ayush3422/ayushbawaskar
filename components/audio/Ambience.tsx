@@ -6,20 +6,22 @@ import { useDepth } from "@/components/depth/DepthProvider";
 
 const STORAGE_KEY = "abyss:ambience";
 
+/** Any of these counts as the gesture browsers demand before audio may start. */
+const GESTURES = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+
 /**
- * Ambience: the supplied wave recording, and nothing else. An earlier pass
- * layered a synthesised pressure drone and sonar returns over it; those are
- * gone.
+ * Ambience: the supplied wave recording, routed through a depth-driven lowpass
+ * so it muffles as you descend — 4.2 kHz of surf at the surface down to 320 Hz
+ * at the trench floor.
  *
- * It is still routed through a depth-driven lowpass, which is processing of
- * the same recording rather than another sound: it muffles as you descend,
- * 4.2 kHz of surf at the surface down to 320 Hz at the floor.
+ * On by default, but it cannot literally autoplay: every current browser
+ * refuses audio that starts without a user gesture, and an attempt is rejected
+ * rather than delayed. So it tries immediately, and if refused it arms itself
+ * to start on the visitor's first scroll, click or keypress — which on a page
+ * whose first instruction is "scroll to descend" is a second or two away.
  *
- * The file is 4.5 MB and is fetched only when the toggle is switched on, so a
- * visitor who never touches it never pays for it.
- *
- * It never autoplays. Browsers block that, and a page that makes noise at a
- * stranger uninvited deserves to be closed.
+ * Turning it off is remembered, and a visitor who has turned it off is never
+ * asked again.
  */
 export function Ambience() {
   const { depth } = useDepth();
@@ -42,46 +44,93 @@ export function Ambience() {
     masterRef.current = null;
   }, []);
 
-  const start = useCallback(() => {
-    const Ctx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext;
-    const ctx = new Ctx();
-    ctxRef.current = ctx;
+  /**
+   * Builds the graph on first call and resumes it on later ones, so a refused
+   * attempt can simply be retried on the next gesture without leaking a second
+   * AudioContext. Resolves to whether sound is actually playing.
+   */
+  const start = useCallback(async (): Promise<boolean> => {
+    if (!ctxRef.current) {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      const ctx = new Ctx();
+      ctxRef.current = ctx;
 
-    const master = ctx.createGain();
-    master.gain.value = 0.0001;
-    master.connect(ctx.destination);
-    masterRef.current = master;
-    // Ease in, so switching it on is not a slap.
-    master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.6);
+      const master = ctx.createGain();
+      master.gain.value = 0.0001;
+      master.connect(ctx.destination);
+      masterRef.current = master;
+      // Ease in, so arriving on the page is not a slap.
+      master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.8);
 
-    // --- water: the recording, through a lowpass that closes with depth ----
-    const el = new Audio("/audio/ocean-waves.mp3");
-    el.loop = true;
-    el.preload = "auto";
-    el.crossOrigin = "anonymous";
-    audioRef.current = el;
+      const el = new Audio("/audio/ocean-waves.mp3");
+      el.loop = true;
+      el.preload = "auto";
+      audioRef.current = el;
 
-    const source = ctx.createMediaElementSource(el);
+      const source = ctx.createMediaElementSource(el);
 
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 4200;
-    filter.Q.value = 0.7;
-    filterRef.current = filter;
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.value = 4200;
+      filter.Q.value = 0.7;
+      filterRef.current = filter;
 
-    const waterGain = ctx.createGain();
-    waterGain.gain.value = 0.9;
+      const waterGain = ctx.createGain();
+      waterGain.gain.value = 0.9;
 
-    source.connect(filter).connect(waterGain).connect(master);
-    // Autoplay policy is satisfied: this only ever runs from a click.
-    void el.play().catch(() => {
-      // Blocked anyway on some setups. The drone and pings still work.
-    });
+      source.connect(filter).connect(waterGain).connect(master);
+    }
 
+    const ctx = ctxRef.current;
+    const el = audioRef.current;
+    if (!ctx || !el) return false;
+
+    try {
+      if (ctx.state === "suspended") await ctx.resume();
+      await el.play();
+      return !el.paused;
+    } catch {
+      // Refused. The caller will try again on the next gesture.
+      return false;
+    }
   }, []);
+
+  // On by default, unless this visitor has said otherwise.
+  useEffect(() => {
+    let optedOut = false;
+    try {
+      optedOut = localStorage.getItem(STORAGE_KEY) === "off";
+    } catch {
+      // Storage unavailable. Treat as no preference.
+    }
+    if (optedOut) return;
+
+    let settled = false;
+    const detach = () => {
+      for (const e of GESTURES) window.removeEventListener(e, attempt);
+      window.removeEventListener("scroll", attempt);
+    };
+
+    async function attempt() {
+      if (settled) return;
+      const playing = await start();
+      if (!playing) return;
+      settled = true;
+      setOn(true);
+      detach();
+    }
+
+    void attempt();
+    for (const e of GESTURES) {
+      window.addEventListener(e, attempt, { passive: true });
+    }
+    window.addEventListener("scroll", attempt, { passive: true });
+
+    return detach;
+  }, [start]);
 
   // Depth drives the filter while it is running.
   useEffect(() => {
@@ -89,15 +138,13 @@ export function Ambience() {
     const filter = filterRef.current;
     if (!ctx || !filter) return;
 
-    // Water muffles as it deepens: 4.2 kHz of surf at the surface down to
-    // 320 Hz of rumble at the floor.
     const t = Math.min(depth / MAX_DEPTH, 1);
     filter.frequency.setTargetAtTime(4200 - 3880 * t, ctx.currentTime, 0.5);
   }, [depth]);
 
   useEffect(() => teardown, [teardown]);
 
-  const toggle = () => {
+  const toggle = async () => {
     if (on) {
       teardown();
       setOn(false);
@@ -108,8 +155,8 @@ export function Ambience() {
       }
       return;
     }
-    start();
-    setOn(true);
+    const playing = await start();
+    setOn(playing);
     try {
       localStorage.setItem(STORAGE_KEY, "on");
     } catch {
