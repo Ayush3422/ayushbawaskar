@@ -24,11 +24,17 @@ export interface OceanRenderer {
   setDepth(depth: number): void;
 }
 
-/** FFT resolution. 256 is 8 butterfly stages per direction. */
-const N = 256;
+/**
+ * FFT resolution. At 256 this ran 8 butterfly stages per direction over 65k
+ * texels — three transforms, 48 ping-pong passes a frame — and dominated the
+ * frame budget badly enough to make scrolling feel heavy. 128 is 7 stages over
+ * a quarter of the texels, and at the scale the surface is drawn the detail is
+ * indistinguishable.
+ */
+const N = 128;
 /** Patch size in metres. */
 const L = 512;
-const GRID_SEGMENTS = 255;
+const GRID_SEGMENTS = 191;
 /** The wave patch is repeated this many times per axis to push the horizon out. */
 const TILES = 3;
 const CHOPPINESS = 1.1;

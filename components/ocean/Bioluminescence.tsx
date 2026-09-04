@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { depthSignal } from "@/lib/depthSignal";
 
 const COUNT = 90;
 
@@ -24,7 +25,9 @@ export function Bioluminescence() {
     if (!ctx) return;
 
     let raf = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Decorative and soft-edged: rendering it at 2x buys nothing and doubles
+    // the pixels cleared and filled every frame.
+    const dpr = 1;
 
     const resize = () => {
       canvas.width = Math.max(Math.floor(window.innerWidth * dpr), 1);
@@ -46,16 +49,25 @@ export function Bioluminescence() {
       phase: Math.random() * Math.PI * 2,
     }));
 
+    // One soft halo with a bright core, rasterised once.
+    const sprite = document.createElement("canvas");
+    sprite.width = 64;
+    sprite.height = 64;
+    const sctx = sprite.getContext("2d")!;
+    const grad = sctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, "rgba(214, 250, 244, 1)");
+    grad.addColorStop(0.18, "rgba(87, 207, 192, 0.72)");
+    grad.addColorStop(1, "rgba(87, 207, 192, 0)");
+    sctx.fillStyle = grad;
+    sctx.fillRect(0, 0, 64, 64);
+
     const draw = (now: number) => {
-      const presence = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--hadal-presence",
-        ) || "0",
-      );
+      const presence = depthSignal.hadal;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (presence > 0.01) {
+        ctx.globalCompositeOperation = "lighter";
         for (const m of motes) {
           m.y -= m.v;
           if (m.y < 0) {
@@ -69,23 +81,18 @@ export function Bioluminescence() {
 
           const px = m.x * canvas.width;
           const py = m.y * canvas.height;
-          const rad = m.r * dpr;
+          const size = m.r * 14;
 
-          // A soft halo around a bright core, which is what a point of light
-          // in water actually looks like.
-          const grad = ctx.createRadialGradient(px, py, 0, px, py, rad * 6);
-          grad.addColorStop(0, `rgba(87, 207, 192, ${alpha})`);
-          grad.addColorStop(1, "rgba(87, 207, 192, 0)");
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(px, py, rad * 6, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.fillStyle = `rgba(190, 245, 238, ${alpha * 0.9})`;
-          ctx.beginPath();
-          ctx.arc(px, py, rad, 0, Math.PI * 2);
-          ctx.fill();
+          // The sprite is drawn once at init and stamped here. Building a
+          // radial gradient per mote per frame meant ninety gradient objects
+          // allocated sixty times a second, which is most of what this layer
+          // used to cost.
+          ctx.globalAlpha = alpha;
+          ctx.drawImage(sprite, px - size / 2, py - size / 2, size, size);
         }
+
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
       }
 
       raf = requestAnimationFrame(draw);

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { depthSignal } from "@/lib/depthSignal";
 
 const MAX_PARTICLES = 220;
 
@@ -23,7 +24,7 @@ export function MarineSnow() {
     if (!ctx) return;
 
     let raf = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = 1;
 
     const resize = () => {
       canvas.width = Math.max(Math.floor(window.innerWidth * dpr), 1);
@@ -40,11 +41,7 @@ export function MarineSnow() {
     }));
 
     const draw = () => {
-      const density = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--snow-density",
-        ) || "0",
-      );
+      const density = depthSignal.snow;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 

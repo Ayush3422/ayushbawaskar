@@ -107,7 +107,7 @@ export function Caustics() {
     // Slightly under native: caustic filaments need enough resolution to stay
     // filaments, but nobody counts their pixels.
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * 0.8;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * 0.6;
       canvas.width = Math.max(Math.floor(window.innerWidth * dpr), 1);
       canvas.height = Math.max(Math.floor(window.innerHeight * dpr), 1);
     };
