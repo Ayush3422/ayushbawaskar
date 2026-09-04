@@ -208,7 +208,7 @@ export function createRenderer({
       g.drawArrays(g.TRIANGLES, 0, 3);
     };
 
-    /** 8 horizontal then 8 vertical butterfly passes over one complex field. */
+    /** 7 horizontal then 7 vertical butterfly passes over one complex field. */
     const transform = (
       texA: WebGLTexture,
       texB: WebGLTexture,

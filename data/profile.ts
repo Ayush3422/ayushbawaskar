@@ -68,8 +68,8 @@ export const headlineStats: {
 /** How this site is built. Verifiable by reading it. */
 export const colophon: { label: string; value: string }[] = [
   { label: "Framework", value: "Next.js 16, TypeScript, Tailwind v4, shadcn/ui" },
-  { label: "Ocean", value: "Hand-written WebGL2 FFT — Phillips spectrum, 256² grid" },
-  { label: "Passes", value: "48 butterfly ping-pongs per frame, plus normals and foam" },
+  { label: "Ocean", value: "Hand-written WebGL2 FFT — Phillips spectrum, 128² grid" },
+  { label: "Passes", value: "42 butterfly ping-pongs per frame, plus normals and foam" },
   { label: "Verification", value: "Butterfly table checked against a reference DFT" },
   { label: "Degrades to", value: "A readable page with WebGL disabled" },
   { label: "Type", value: "IBM Plex Mono · Pixelify Sans · Instrument Serif" },

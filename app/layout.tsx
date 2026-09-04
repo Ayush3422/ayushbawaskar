@@ -22,10 +22,28 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
+const description =
+  "Applied ML, blockchain and systems work by Ayush Bawaskar. Every claim on this page links to the repository that backs it.";
+
 export const metadata: Metadata = {
+  // Required for the OG image to resolve to an absolute URL. Without it the
+  // card is advertised as a relative path, which every scraper ignores.
+  metadataBase: new URL("https://ayushbawaskar.vercel.app"),
   title: "Ayush Bawaskar — ABYSS",
-  description:
-    "Applied ML, blockchain and systems work by Ayush Bawaskar. Every claim on this page links to the repository that backs it.",
+  description,
+  openGraph: {
+    title: "Ayush Bawaskar — ABYSS",
+    description,
+    url: "/",
+    siteName: "ABYSS",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ayush Bawaskar — ABYSS",
+    description,
+  },
 };
 
 export default function RootLayout({
