@@ -7,12 +7,16 @@ import { useDepth } from "@/components/depth/DepthProvider";
 const STORAGE_KEY = "abyss:ambience";
 
 /**
- * Ambience, synthesised rather than played from a file.
+ * Ambience: a recording of ocean waves for the water, plus a synthesised drone
+ * for pressure and an occasional sonar return.
  *
- * Nothing is shipped and nothing is licensed: it is filtered noise for the
- * water, a low drone for pressure, and an occasional ping. Because it is
- * generated, it can follow the depth — the filter closes as you descend, so
- * the water muffles the way it actually does, and the drone drops.
+ * The recording is routed through the same depth-driven lowpass the noise bed
+ * used, so it still muffles as you descend — a flat loop would sound identical
+ * at 40 m and 11,000 m, which would waste the one thing this page can do that
+ * a music player cannot.
+ *
+ * The file is 4.5 MB and is fetched only when the toggle is switched on, so a
+ * visitor who never touches it never pays for it.
  *
  * It never autoplays. Browsers block that, and a page that makes noise at a
  * stranger uninvited deserves to be closed.
@@ -26,6 +30,7 @@ export function Ambience() {
   const droneRef = useRef<OscillatorNode | null>(null);
   const masterRef = useRef<GainNode | null>(null);
   const pingRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const depthRef = useRef(0);
 
   const teardown = useCallback(() => {
@@ -33,6 +38,11 @@ export function Ambience() {
     pingRef.current = null;
     droneRef.current?.stop();
     droneRef.current = null;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
     void ctxRef.current?.close();
     ctxRef.current = null;
     filterRef.current = null;
@@ -54,32 +64,29 @@ export function Ambience() {
     // Ease in, so switching it on is not a slap.
     master.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 1.6);
 
-    // --- water: two seconds of noise, looped through a moving lowpass ------
-    const frames = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    let last = 0;
-    for (let i = 0; i < frames; i++) {
-      // Brown noise: integrated white. Heavier and less hissy than white,
-      // which is what moving water sounds like.
-      last = (last + Math.random() * 2 - 1) * 0.5;
-      data[i] = last * 3.2;
-    }
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    noise.loop = true;
+    // --- water: the recording, through a lowpass that closes with depth ----
+    const el = new Audio("/audio/ocean-waves.mp3");
+    el.loop = true;
+    el.preload = "auto";
+    el.crossOrigin = "anonymous";
+    audioRef.current = el;
+
+    const source = ctx.createMediaElementSource(el);
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 900;
-    filter.Q.value = 0.6;
+    filter.frequency.value = 4200;
+    filter.Q.value = 0.7;
     filterRef.current = filter;
 
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0.5;
+    const waterGain = ctx.createGain();
+    waterGain.gain.value = 0.9;
 
-    noise.connect(filter).connect(noiseGain).connect(master);
-    noise.start();
+    source.connect(filter).connect(waterGain).connect(master);
+    // Autoplay policy is satisfied: this only ever runs from a click.
+    void el.play().catch(() => {
+      // Blocked anyway on some setups. The drone and pings still work.
+    });
 
     // --- pressure: a low drone that sinks with you ------------------------
     const drone = ctx.createOscillator();
@@ -122,8 +129,10 @@ export function Ambience() {
 
     depthRef.current = depth;
     const t = Math.min(depth / MAX_DEPTH, 1);
-    // Water muffles as it deepens: 900 Hz at the surface down to 180 Hz.
-    filter.frequency.setTargetAtTime(900 - 720 * t, ctx.currentTime, 0.4);
+    // Water muffles as it deepens. A recording carries real high end, so the
+    // sweep runs much further than the synthetic bed needed: 4.2 kHz of surf at
+    // the surface down to 320 Hz of muffled rumble at the floor.
+    filter.frequency.setTargetAtTime(4200 - 3880 * t, ctx.currentTime, 0.5);
     drone.frequency.setTargetAtTime(62 - 22 * t, ctx.currentTime, 0.6);
   }, [depth]);
 
