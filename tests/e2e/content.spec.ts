@@ -15,9 +15,26 @@ test("no self-assigned percentage scores appear", async ({ page }) => {
 
 test("contact details are present and linked", async ({ page }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("link", { name: /ayushbawaskar4@gmail\.com/ }),
-  ).toHaveAttribute("href", "mailto:ayushbawaskar4@gmail.com");
+  // The address appears twice on purpose: once at size in the reach-me panel
+  // and once as an icon in the sign-off, so this must be scoped.
+  const mailto = page.locator('a[href="mailto:ayushbawaskar4@gmail.com"]');
+  await expect(mailto).toHaveCount(2);
+  await expect(mailto.first()).toBeVisible();
+});
+
+test("the sign-off contact icons keep their names", async ({ page }) => {
+  await page.goto("/");
+  // Icon-only links are invisible to a screen reader without a label.
+  for (const [label, href] of [
+    ["Email", "mailto:ayushbawaskar4@gmail.com"],
+    ["GitHub", "https://github.com/Ayush3422"],
+    ["LinkedIn", "https://www.linkedin.com/in/ayush-bawaskar-254322340/"],
+  ] as const) {
+    const link = page.locator(`a[href="${href}"][aria-label]`);
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAccessibleName(new RegExp(label));
+    await expect(link.locator("svg")).toHaveCount(1);
+  }
 });
 
 test("excluded claims never appear", async ({ page }) => {

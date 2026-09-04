@@ -1,5 +1,6 @@
 import { profile, colophon } from "@/data/profile";
 import { Label, Panel, PixelRule, SpecSheet, Stamp } from "@/components/ui/primitives";
+import { iconFor } from "@/components/ui/icons";
 
 export function Contact() {
   return (
@@ -157,20 +158,36 @@ export function Contact() {
 
           {/* The links repeat here because the reader has finished and this is
               where they decide whether to act. */}
-          <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            {profile.links.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  target={l.href.startsWith("http") ? "_blank" : undefined}
-                  rel={l.href.startsWith("http") ? "noreferrer" : undefined}
-                  className="font-mono text-[10px] tracking-[0.2em] uppercase underline underline-offset-4 transition-colors hover:text-foreground"
-                  style={{ color: "var(--signal)" }}
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
+          <ul className="flex flex-wrap gap-2">
+            {profile.links.map((l) => {
+              const Icon = iconFor(l.label);
+              const target = l.href
+                .replace(/^mailto:/, "")
+                .replace(/^https?:\/\//, "");
+              return (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    target={l.href.startsWith("http") ? "_blank" : undefined}
+                    rel={l.href.startsWith("http") ? "noreferrer" : undefined}
+                    /* Icon-only, so the name has to be carried by the label —
+                       otherwise this reads as a bare link to a screen reader. */
+                    aria-label={`${l.label} — ${target}`}
+                    title={`${l.label} — ${target}`}
+                    className="flex h-10 w-10 items-center justify-center border-2 border-border transition-colors hover:border-[var(--signal)] hover:text-[var(--signal)]"
+                    style={{ color: "var(--signal)" }}
+                  >
+                    {Icon ? (
+                      <Icon />
+                    ) : (
+                      <span className="font-mono text-[10px] tracking-[0.2em] uppercase">
+                        {l.label.slice(0, 2)}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
 
           <a
