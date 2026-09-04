@@ -6,6 +6,7 @@ import { MarineSnow } from "@/components/ocean/MarineSnow";
 import { Bioluminescence } from "@/components/ocean/Bioluminescence";
 import { Caustics } from "@/components/ocean/Caustics";
 import { DiveLight } from "@/components/ocean/DiveLight";
+import { Relic } from "@/components/ocean/Relic";
 import { TrenchFloor } from "@/components/ocean/TrenchFloor";
 import { Zone } from "@/components/zones/Zone";
 import { Surface } from "@/components/zones/Surface";
@@ -28,6 +29,7 @@ export default function Page() {
       <OceanLayer />
       <MarineSnow />
       <Bioluminescence />
+      <Relic />
       <Caustics />
       <DiveLight />
 

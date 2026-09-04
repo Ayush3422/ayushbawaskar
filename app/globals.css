@@ -95,6 +95,7 @@
   --surface-scrim: 1;
   --hadal-presence: 0;
   --lamp-strength: 0.25;
+  --relic: 0;
 
   /*
    * Pressure, 0 at the surface to 1 at the trench floor. The interface is

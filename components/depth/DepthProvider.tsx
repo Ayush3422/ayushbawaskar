@@ -187,6 +187,16 @@ export function DepthProvider({ children }: { children: React.ReactNode }) {
       root.setProperty("--lamp-strength", lamp.toFixed(3));
 
       /*
+       * The relic is wanted across Twilight, Midnight and Abyssal — 200 m to
+       * 6,000 m. It fades in over the first stretch of Twilight and back out
+       * through the end of Abyssal, so it arrives and leaves rather than
+       * switching on at a section boundary.
+       */
+      const rise = Math.min(Math.max((depth - 200) / 500, 0), 1);
+      const fall = 1 - Math.min(Math.max((depth - 5200) / 800, 0), 1);
+      root.setProperty("--relic", (rise * fall * 0.42).toFixed(4));
+
+      /*
        * Pressure, quantised to twentieths. It drives letter-spacing and
        * padding, which force layout — writing a fresh value every frame would
        * relayout the whole document sixty times a second. Twenty steps across
