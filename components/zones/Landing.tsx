@@ -5,11 +5,18 @@ import { profile } from "@/data/profile";
 import { ZONES, MAX_DEPTH } from "@/lib/depth";
 import { BootBand } from "@/components/boot/BootBand";
 
-/** Time at 100 before standing down, so the reader sees it complete. */
-const HOLD_MS = 520;
+/** Time at 100 before the card starts leaving, so the reader sees it complete. */
+const HOLD_MS = 480;
 
-/** The clearing fade. */
-const FADE_MS = 520;
+/** Gap between one element leaving and the next. */
+const OUT_STAGGER_MS = 60;
+
+/** After the text has gone, the ground it sat on fades. */
+const PANEL_FADE_MS = 380;
+const PANEL_FADE_DELAY_MS = 560;
+
+/** Total time from the card starting to leave to it being removed. */
+const OUT_MS = PANEL_FADE_DELAY_MS + PANEL_FADE_MS;
 
 /**
  * The landing screen, ahead of the dive.
@@ -26,19 +33,40 @@ const FADE_MS = 520;
  * at all, because nothing would be left to take it away again.
  */
 export function Landing() {
+  const [settled, setSettled] = useState(false);
   const [phase, setPhase] = useState<"up" | "clearing" | "gone">("up");
 
-  const standDown = useCallback(() => setPhase("clearing"), []);
+  const standDown = useCallback(() => setSettled(true), []);
+
+  // Hold at 100 first. Leaving the instant the bar fills reads as a glitch
+  // rather than as the card standing down.
+  useEffect(() => {
+    if (!settled) return;
+    const start = window.setTimeout(() => setPhase("clearing"), HOLD_MS);
+    return () => window.clearTimeout(start);
+  }, [settled]);
 
   useEffect(() => {
     if (phase !== "clearing") return;
-    const done = window.setTimeout(() => setPhase("gone"), HOLD_MS + FADE_MS);
+    const done = window.setTimeout(() => setPhase("gone"), OUT_MS);
     return () => window.clearTimeout(done);
   }, [phase]);
 
   if (phase === "gone") return null;
 
   const clearing = phase === "clearing";
+
+  /**
+   * Arrival and departure for one line, by its position down the card. Coming
+   * in, the delay opens after the first beat so the whole card is not one
+   * block; going out, it runs top-down so the title leaves first.
+   */
+  const line = (i: number, base: string) => ({
+    className: `${base} ${clearing ? "landing-out" : "landing-in"}`,
+    style: {
+      animationDelay: clearing ? `${i * OUT_STAGGER_MS}ms` : `${90 + i * 90}ms`,
+    },
+  });
 
   const specs = [
     { label: "Depth", value: `${MAX_DEPTH.toLocaleString("en-US")} m` },
@@ -71,7 +99,9 @@ export function Landing() {
         backgroundSize: "64px 64px",
         opacity: clearing ? 0 : 1,
         pointerEvents: clearing ? "none" : undefined,
-        transition: `opacity ${FADE_MS}ms ease-out ${HOLD_MS}ms`,
+        // Held until the text has finished leaving, so the lines animate out
+        // against the card rather than dissolving with it.
+        transition: `opacity ${PANEL_FADE_MS}ms ease-out ${PANEL_FADE_DELAY_MS}ms`,
       }}
     >
       <div className="flex flex-1 items-center justify-center">
@@ -80,7 +110,12 @@ export function Landing() {
           <Corners />
 
           <div className="relative flex flex-col items-center gap-6 text-center">
-            <span className="font-mono text-[10px] tracking-[0.4em] text-muted-foreground uppercase">
+            <span
+              {...line(
+                0,
+                "font-mono text-[10px] tracking-[0.4em] text-muted-foreground uppercase",
+              )}
+            >
               Challenger Deep
             </span>
 
@@ -92,7 +127,7 @@ export function Landing() {
                 characters longer than the wordmark it replaced. Measured: it
                 ran off a 390px screen at the old 2rem floor, and still ran
                 three pixels past a 320px one at 1.35rem. */}
-            <div className="relative">
+            <div {...line(1, "relative")}>
               <Crosses />
               <p
                 className="border-y-2 px-3 py-4 font-display text-[clamp(1.15rem,5vw,3.5rem)] leading-none tracking-[0.12em] whitespace-nowrap sm:px-6"
@@ -107,15 +142,27 @@ export function Landing() {
 
             {/* Backed by the education entry in the profile: BTech CSE (AI-ML),
                 New LJ Institute, from August 2024. */}
-            <p className="font-mono text-[11px] tracking-[0.28em] text-foreground/75 uppercase sm:text-xs">
+            <p
+              {...line(
+                2,
+                "font-mono text-[11px] tracking-[0.28em] text-foreground/75 uppercase sm:text-xs",
+              )}
+            >
               An CSE (AI-ML) student
             </p>
 
-            <p className="max-w-lg font-serif text-lg text-foreground/75 md:text-xl">
+            <p
+              {...line(3, "max-w-lg font-serif text-lg text-foreground/75 md:text-xl")}
+            >
               {profile.heroLine}
             </p>
 
-            <dl className="mt-2 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            <dl
+              {...line(
+                4,
+                "mt-2 flex flex-wrap items-center justify-center gap-x-8 gap-y-3",
+              )}
+            >
               {specs.map((s) => (
                 <div key={s.label} className="flex items-baseline gap-2">
                   <dt className="font-mono text-[9px] tracking-[0.25em] text-muted-foreground/60 uppercase">
@@ -132,7 +179,7 @@ export function Landing() {
       </div>
 
       {/* Middle-bottom: horizontally centred, in the lower part of the screen. */}
-      <div className="mx-auto w-full max-w-4xl">
+      <div {...line(5, "mx-auto w-full max-w-4xl")}>
         <BootBand onSettled={standDown} />
       </div>
     </section>

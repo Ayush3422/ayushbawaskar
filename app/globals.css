@@ -389,3 +389,44 @@
 .sonar-ring {
   animation: sonar-ring 7.2s ease-out infinite;
 }
+
+/*
+ * Landing text, arriving and leaving.
+ *
+ * Both are plain CSS animations with fill-mode both, so a stalled or blocked
+ * bundle cannot leave the card's text stuck at opacity 0 — and the global
+ * reduced-motion rule above collapses their duration, which lands each element
+ * on its end state immediately rather than needing a separate code path.
+ *
+ * Outgoing lifts rather than sinks. The reader is about to descend, so the
+ * surface card rising away is the direction the rest of the page implies.
+ */
+@keyframes landing-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes landing-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-26px);
+  }
+}
+
+.landing-in {
+  animation: landing-in 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.landing-out {
+  animation: landing-out 420ms cubic-bezier(0.4, 0, 1, 1) both;
+}
