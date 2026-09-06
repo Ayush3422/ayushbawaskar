@@ -37,7 +37,7 @@ const stripes = (color: string) =>
  * the hero is readable from the first paint and the band simply reports, then
  * turns into the invitation to scroll.
  */
-export function BootBand() {
+export function BootBand({ onSettled }: { onSettled?: () => void }) {
   const reduced = useReducedMotion();
   const [reached, setReached] = useState<Milestone[]>([]);
   const [shown, setShown] = useState(0);
@@ -107,6 +107,19 @@ export function BootBand() {
   const percent = Math.round(shown);
   const done = reached.length;
   const settled = shown >= 100;
+
+  // Announced once, and only once — the landing above listens for this to
+  // stand down, and firing it again on a later render would restart that.
+  const announcedRef = useRef(false);
+  const onSettledRef = useRef(onSettled);
+  useEffect(() => {
+    onSettledRef.current = onSettled;
+  }, [onSettled]);
+  useEffect(() => {
+    if (!settled || announcedRef.current) return;
+    announcedRef.current = true;
+    onSettledRef.current?.();
+  }, [settled]);
 
   /*
    * The caption follows whichever is further behind, the bar or the work.

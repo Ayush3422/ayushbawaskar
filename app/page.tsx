@@ -9,6 +9,7 @@ import { DiveLight } from "@/components/ocean/DiveLight";
 import { Relic } from "@/components/ocean/Relic";
 import { TrenchFloor } from "@/components/ocean/TrenchFloor";
 import { Zone } from "@/components/zones/Zone";
+import { Landing } from "@/components/zones/Landing";
 import { Surface } from "@/components/zones/Surface";
 import { About } from "@/components/zones/About";
 import { Work } from "@/components/zones/Work";
@@ -57,6 +58,9 @@ export default function Page() {
 
       <DepthNav />
       <DiveComputer />
+
+      {/* Over the page until the dive can start, then gone. */}
+      <Landing />
 
       <main id="main">
         <Surface />

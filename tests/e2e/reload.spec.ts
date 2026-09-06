@@ -59,6 +59,10 @@ test("reloading from deep in the page returns to the surface", async ({ page }) 
   await page.waitForTimeout(600);
 
   expect(await scrollY(page)).toBe(0);
+  // The landing gate is over the page on a fresh load; once it stands down the
+  // hero must be what is on screen, not wherever the reader had scrolled to.
+  await page.waitForSelector("#landing", { state: "detached", timeout: 20_000 });
+  expect(await scrollY(page)).toBe(0);
   await expect(page.locator("h1")).toBeInViewport();
 });
 

@@ -366,3 +366,26 @@
 .descend {
   animation: descend 1.9s ease-in-out infinite;
 }
+
+/*
+ * Sonar rings on the landing plate. Ornamental — the one element on that
+ * screen that measures nothing — so it is a slow outward pulse rather than
+ * anything that could be read as an instrument.
+ */
+@keyframes sonar-ring {
+  0% {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.sonar-ring {
+  animation: sonar-ring 7.2s ease-out infinite;
+}

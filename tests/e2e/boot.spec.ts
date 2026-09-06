@@ -1,51 +1,85 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 /**
- * The dive status band. It reports real initialisation, so the things worth
- * pinning are that it finishes, that it never claims to be finished early, and
- * above all that it never stands between a reader and the page — an earlier
- * pass covered the whole screen with it, which is the failure mode to guard.
+ * The landing gate and the status band inside it.
+ *
+ * The gate covers the page while the dive is being prepared and stands down on
+ * its own when the band reaches 100. The things worth pinning are that it
+ * always stands down, that the site's own content never depended on it having
+ * run, and that the band never claims to be finished before it is.
  */
 
-const band = (page: import("@playwright/test").Page) =>
-  page.locator("[data-boot]");
+const landing = (page: Page) => page.locator("#landing");
+const band = (page: Page) => page.locator("[data-boot]");
 
-test("the hero is readable while the band is still loading", async ({ page }) => {
-  await page.goto("/");
+const gateCleared = (page: Page) =>
+  page.waitForSelector("#landing", { state: "detached", timeout: 20_000 });
 
-  // No waiting, no settling: the headline must be there on arrival.
-  await expect(page.locator("h1")).toBeVisible();
-  await expect(page.locator("h1")).toContainText("Measured");
-  await expect(page.locator('nav[aria-label="Dive plan"]')).toBeVisible();
-});
-
-test("the band covers nothing", async ({ page }) => {
+test("the gate is up on arrival and covers the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
-  const box = await band(page).boundingBox();
+  const box = await landing(page).boundingBox();
   expect(box).not.toBeNull();
-
-  const heading = await page.locator("h1").boundingBox();
-  expect(heading).not.toBeNull();
-
-  // A full-screen overlay would sit on top of the headline. This asserts the
-  // band is a band: it starts below the headline and is a fraction of the page.
-  expect(box!.y).toBeGreaterThan(heading!.y + heading!.height);
-  expect(box!.height).toBeLessThan(320);
+  expect(box!.width).toBeGreaterThanOrEqual(1440);
+  expect(box!.height).toBeGreaterThanOrEqual(880);
 });
 
-test("it reaches a hundred and turns into the scroll cue", async ({ page }) => {
+test("the page behind the gate is already built, not waiting on it", async ({
+  page,
+}) => {
   await page.goto("/");
 
-  await expect
-    .poll(() => band(page).getAttribute("data-boot-settled"), { timeout: 15_000 })
-    .toBe("true");
+  // Present in the document from the first paint. Nothing about the site's
+  // content is gated on the animation having finished.
+  await expect(page.locator("h1")).toContainText("Measured");
+  await expect(page.locator('nav[aria-label="Dive plan"]')).toHaveCount(1);
+  expect(await page.locator("main section[id]").count()).toBeGreaterThan(5);
+});
 
-  const bar = page.getByRole("progressbar", { name: "Preparing the dive" });
-  await expect(bar).toHaveAttribute("aria-valuenow", "100");
-  await expect(band(page)).toContainText("Ready");
-  await expect(band(page)).toContainText("Scroll to descend");
+test("the band is a band inside the gate, not the gate itself", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  const bandBox = await band(page).boundingBox();
+  const wordmark = await page
+    .locator("#landing p", { hasText: "ABYSS" })
+    .first()
+    .boundingBox();
+  expect(bandBox).not.toBeNull();
+  expect(wordmark).not.toBeNull();
+
+  // Middle-bottom: below the title, in the lower half, and a fraction of the
+  // screen rather than all of it.
+  expect(bandBox!.y).toBeGreaterThan(wordmark!.y + wordmark!.height);
+  expect(bandBox!.y).toBeGreaterThan(450);
+  expect(bandBox!.height).toBeLessThan(320);
+});
+
+test("reaching a hundred stands the gate down and reveals the home page", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(landing(page)).toHaveCount(1);
+
+  await gateCleared(page);
+
+  await expect(page.locator("h1")).toBeInViewport();
+  await expect(landing(page)).toHaveCount(0);
+  // Handing over must not leave the reader part-way down the page.
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+});
+
+test("the home page is interactive once the gate has gone", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await gateCleared(page);
+
+  // A click that lands proves nothing invisible is left over the page.
+  await page.locator('nav[aria-label="Depth zones"] a[href="#twilight"]').click();
+  await expect.poll(() => page.url(), { timeout: 5000 }).toContain("#twilight");
 });
 
 test("the caption never runs ahead of the bar", async ({ page }) => {
@@ -53,7 +87,7 @@ test("the caption never runs ahead of the bar", async ({ page }) => {
 
   // Sampled across the sweep: "Ready to dive" over a bar reading 14% was a real
   // bug, caused by reading the caption off the milestone count alone.
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < 14; i++) {
     const state = await page.evaluate(() => {
       const el = document.querySelector("[data-boot]");
       if (!el) return null;
@@ -67,13 +101,13 @@ test("the caption never runs ahead of the bar", async ({ page }) => {
     if (state.text.includes("Scroll to descend")) {
       expect(state.value).toBe(100);
     }
-    await page.waitForTimeout(80);
+    await page.waitForTimeout(70);
   }
 });
 
-test("the band survives a page with no WebGL", async ({ page }) => {
+test("the gate stands down on a machine with no WebGL", async ({ page }) => {
   // With no ocean to build there is no spectrum to wait for, so the band has
-  // to stop waiting rather than hang at three quarters for the abandon timeout.
+  // to stop waiting rather than hold the gate shut until the abandon timeout.
   await page.addInitScript(() => {
     // Widened deliberately: getContext is a union of overloads that no single
     // patched signature satisfies, and this only needs to refuse one string.
@@ -81,40 +115,44 @@ test("the band survives a page with no WebGL", async ({ page }) => {
       getContext: (type: string, ...rest: unknown[]) => unknown;
     };
     const original = proto.getContext;
-    proto.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+    proto.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...rest: unknown[]
+    ) {
       if (type === "webgl2") return null;
       return original.call(this, type, ...rest);
     };
   });
   await page.goto("/");
 
-  await expect
-    .poll(() => band(page).getAttribute("data-boot-settled"), { timeout: 8000 })
-    .toBe("true");
+  await gateCleared(page);
+  await expect(page.locator("h1")).toBeInViewport();
 });
 
-test("reduced motion settles without animating", async ({ browser }) => {
+test("reduced motion still reaches the page", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
   await page.goto("/");
 
-  await expect
-    .poll(() => page.locator("[data-boot]").getAttribute("data-boot-settled"), {
-      timeout: 8000,
-    })
-    .toBe("true");
-  await expect(page.locator("h1")).toBeVisible();
+  await gateCleared(page);
+  await expect(page.locator("h1")).toBeInViewport();
 
   await context.close();
 });
 
-test("the landing page does not overflow on a phone", async ({ page }) => {
+test("the landing does not overflow on a phone", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await expect
-    .poll(() => band(page).getAttribute("data-boot-settled"), { timeout: 15_000 })
-    .toBe("true");
 
+  await expect(band(page)).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+    ),
+  ).toBe(true);
+
+  await gateCleared(page);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth + 1,

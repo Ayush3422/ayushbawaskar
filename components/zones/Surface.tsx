@@ -1,7 +1,6 @@
 import { profile, headlineStats } from "@/data/profile";
 import { Label, Stat } from "@/components/ui/primitives";
 import { TrenchProfile } from "@/components/zones/TrenchProfile";
-import { BootBand } from "@/components/boot/BootBand";
 
 /** Staggered entrance, in seconds. */
 const beat = (n: number) => ({ animationDelay: `${n * 0.09}s` });
@@ -90,11 +89,6 @@ export function Surface() {
           />
         ))}
       </dl>
-
-      {/* Reports the load, then becomes the invitation to descend. */}
-      <div className="rise" style={beat(7)}>
-        <BootBand />
-      </div>
 
     </section>
   );
