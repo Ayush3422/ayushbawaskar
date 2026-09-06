@@ -84,7 +84,16 @@ export function SpecSheet({
           <dt>
             <Label>{r.label}</Label>
           </dt>
-          <dd className="font-mono text-sm text-foreground">{r.value}</dd>
+          {/*
+           * min-w-0 lets the 1fr track shrink below its content, and
+           * break-words lets a value that is one long token wrap inside it.
+           * Values here include addresses like github.com/Ayush3422, which a
+           * browser will not break on its own — at 320px that single row was
+           * enough to take the whole document past the viewport.
+           */}
+          <dd className="min-w-0 font-mono text-sm break-words text-foreground">
+            {r.value}
+          </dd>
         </div>
       ))}
     </dl>

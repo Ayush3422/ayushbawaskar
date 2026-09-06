@@ -28,7 +28,11 @@ export function About() {
       </div>
 
       <div className="grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-        <div className="flex flex-col">
+        {/* min-w-0: a grid item defaults to min-width:auto, so it refuses to
+            shrink below its content's minimum and pushes past the track. That
+            is what put this column at 304px inside a 272px track on a 320px
+            screen, taking the whole document 8px wide. */}
+        <div className="flex min-w-0 flex-col">
           <div className="mb-4 flex items-center gap-3">
             <Stamp>How I work</Stamp>
             <div className="flex-1">
@@ -49,8 +53,12 @@ export function About() {
             <ul className="divide-y-2 divide-border">
               {checkable.map((p, i) => (
                 <li key={p.slug} className="py-3">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="flex items-baseline gap-3">
+                  {/* Wraps rather than holding one line. The metric is
+                      shrink-0 by design — "MAE 255 MW" must not break across
+                      lines — so on a 320px screen it was the last seven pixels
+                      that took the whole document wider than the viewport. */}
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="flex min-w-0 items-baseline gap-3">
                       <span className="font-mono text-[10px] text-muted-foreground/50">
                         {String(i + 1).padStart(2, "0")}
                       </span>
@@ -81,7 +89,10 @@ export function About() {
           </Panel>
         </div>
 
-        <aside className="space-y-10">
+        {/* min-w-0 for the same reason as the column above: below the lg
+            breakpoint both sit in one shared track, so whichever refuses to
+            shrink sizes the track for both. */}
+        <aside className="min-w-0 space-y-10">
           <div>
             <div className="mb-4 flex items-center gap-3">
               <Stamp>The dossier</Stamp>
