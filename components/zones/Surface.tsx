@@ -1,17 +1,7 @@
-import { ZONES } from "@/lib/depth";
 import { profile, headlineStats } from "@/data/profile";
-import { projectCountWord } from "@/data/projects";
 import { Label, Stat } from "@/components/ui/primitives";
-
-/** What waits at each depth. Doubles as the table of contents. */
-const DIVE_PLAN: Record<string, string> = {
-  surface: "You are here",
-  sunlight: "Who you are reading",
-  twilight: `${projectCountWord} contacts, ranked by rigour`,
-  midnight: "Competence plotted against evidence",
-  abyssal: "The log, and the rules it taught",
-  hadal: "Contact, and how this was built",
-};
+import { TrenchProfile } from "@/components/zones/TrenchProfile";
+import { BootBand } from "@/components/boot/BootBand";
 
 /** Staggered entrance, in seconds. */
 const beat = (n: number) => ({ animationDelay: `${n * 0.09}s` });
@@ -80,42 +70,9 @@ export function Surface() {
           </div>
         </div>
 
-        <nav
-          aria-label="Dive plan"
-          className="rise hard-shadow corner-ticks relative border-2 border-border bg-card/55 p-5"
-          style={beat(5)}
-        >
-          <div className="mb-3 flex items-baseline justify-between gap-4 border-b-2 border-border pb-2">
-            <Label>Dive plan</Label>
-            <Label>6 zones</Label>
-          </div>
-
-          <ol className="divide-y-2 divide-border">
-            {ZONES.map((z, i) => (
-              <li key={z.id}>
-                <a
-                  href={`#${z.id}`}
-                  className="group grid grid-cols-[1.6rem_5.5rem_1fr] items-baseline gap-3 py-2.5"
-                >
-                  <span className="font-mono text-[10px] text-muted-foreground/50">
-                    {String(i).padStart(2, "0")}
-                  </span>
-                  <span className="font-mono text-[11px] tracking-[0.18em] uppercase transition-colors group-hover:text-[var(--signal)]">
-                    {z.label}
-                  </span>
-                  <span className="flex items-baseline justify-between gap-3">
-                    <span className="font-serif text-sm text-muted-foreground">
-                      {DIVE_PLAN[z.id]}
-                    </span>
-                    <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground/60">
-                      {z.min.toLocaleString("en-US")} m
-                    </span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
+        <div className="rise" style={beat(5)}>
+          <TrenchProfile />
+        </div>
       </div>
 
       {/* Four figures, each restated with its source further down the page. */}
@@ -134,22 +91,11 @@ export function Surface() {
         ))}
       </dl>
 
-      <div className="rise mt-12 flex items-center gap-4" style={beat(7)}>
-        {/* A mark falling down its rail, rather than a line of muted text
-            nobody notices. */}
-        <span
-          aria-hidden="true"
-          className="relative block h-6 w-px bg-border"
-        >
-          <span
-            className="descend absolute -left-[2px] block h-[5px] w-[5px]"
-            style={{ background: "var(--signal)" }}
-          />
-        </span>
-        <span className="font-mono text-[10px] tracking-[0.25em] text-muted-foreground/70 uppercase">
-          Scroll to descend · 0 m → 11,034 m
-        </span>
+      {/* Reports the load, then becomes the invitation to descend. */}
+      <div className="rise" style={beat(7)}>
+        <BootBand />
       </div>
+
     </section>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { isOceanSupported } from "@/components/ui/fft-ocean-utils/gl";
 import { useDepth } from "@/components/depth/DepthProvider";
 import { OceanFallback } from "./OceanFallback";
+import { bootSignal } from "@/lib/bootSignal";
 
 const FftOcean = dynamic(
   () => import("@/components/ui/fft-ocean").then((m) => m.FftOcean),
@@ -36,9 +37,22 @@ export function OceanLayer() {
     getServerSnapshot,
   );
 
+  // The capability probe has run by the time this renders, so the answer —
+  // either answer — is a milestone the boot screen can stop waiting on. When
+  // there is no ocean to build there is nothing further to wait for either, so
+  // both are reported at once rather than leaving the bar hanging at half.
+  useEffect(() => {
+    bootSignal.mark("gauges");
+    if (!supported) bootSignal.mark("spectrum");
+  }, [supported]);
+
   return (
     <div data-ocean-layer aria-hidden="true" className="fixed inset-0 -z-10">
-      {supported ? <FftOcean depth={depth} /> : <OceanFallback />}
+      {supported ? (
+        <FftOcean depth={depth} onReady={() => bootSignal.mark("spectrum")} />
+      ) : (
+        <OceanFallback />
+      )}
     </div>
   );
 }
