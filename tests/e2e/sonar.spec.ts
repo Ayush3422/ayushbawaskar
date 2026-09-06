@@ -1,19 +1,21 @@
 import { test, expect } from "@playwright/test";
+import { projects } from "@/data/projects";
 
 test("every contact is a real button, deepest first", async ({ page }) => {
   await page.goto("/");
   const contacts = page.locator("[data-contact]");
-  await expect(contacts).toHaveCount(5);
+  // Derived from the data rather than frozen here: this asserts the ordering
+  // rule — every project, deepest range first — so adding a project cannot
+  // pass by updating a literal list to match whatever the page happens to do.
+  const expected = [...projects]
+    .sort((a, b) => b.range - a.range)
+    .map((p) => p.slug);
+
+  await expect(contacts).toHaveCount(expected.length);
   const names = await contacts.evaluateAll((els) =>
     els.map((e) => e.getAttribute("data-contact")),
   );
-  expect(names).toEqual([
-    "nostro",
-    "energy-forecasting",
-    "booksense",
-    "vortifi",
-    "quantumchat",
-  ]);
+  expect(names).toEqual(expected);
 });
 
 test("a contact turns over from the keyboard and shows its evaluation", async ({

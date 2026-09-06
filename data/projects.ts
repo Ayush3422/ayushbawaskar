@@ -32,6 +32,30 @@ export const projects: Project[] = [
       "Match rate is reported Razorpay-side on purpose. Bank and ERP rows carry no settlement-cycle id, so a holdout built on those sources would be scoped to rows a holdout match already touched — making the figure tautologically near 100% and not comparable to the in-sample number. Every value here was produced by scripts/build_evaluation.py, not typed by hand.",
   },
   {
+    slug: "revisehub",
+    name: "ReviseHub",
+    domain: "Developer tools / static analysis",
+    bearing: 145,
+    range: 6200,
+    summary: "Code review for public repositories that runs with no API key.",
+    lede:
+      "Code review for any public GitHub repository, built so the analysis and the language model are separate components. Most AI review tools stop working the moment the key fails; here a deterministic rules engine always runs — secrets, dependency CVEs from OSV.dev, efficiency, complexity, hygiene, repository health — and the AI layer is an optional second pass, labelled apart from the engine so a reader can tell which findings are reproducible and which are a suggestion.",
+    metrics: [
+      { label: "Tests", value: "68", note: "diff parser and every rule group" },
+      {
+        label: "False positives",
+        value: "Tested",
+        note: "rules checked for firing on the wrong thing",
+      },
+      { label: "Rule groups", value: "6", note: "deterministic, no API key" },
+      { label: "Advisories", value: "OSV.dev", note: "real CVE ids and fixed versions" },
+    ],
+    stack: ["Next.js", "TypeScript", "Zod", "Recharts", "Gemini API"],
+    repoUrl: "https://github.com/Ayush3422/REVISEHUB",
+    caveat:
+      "The limitations are in the project's own README rather than left to be discovered: public repositories only with no sign-in, nothing persisted between requests, AST analysis covering JavaScript and TypeScript only, dependency scanning limited to npm, and rate limiting that is per server instance rather than shared. The AI layer can be wrong, which is why its findings are labelled apart from the engine's.",
+  },
+  {
     slug: "energy-forecasting",
     name: "ENERGY_FORECASTING",
     domain: "Applied ML / time series",
@@ -89,6 +113,34 @@ export const projects: Project[] = [
       "The cold-start result is the interesting one and it is not a clean win. Collaborative filtering looks competitive on raw precision with only three interactions, but its catalog coverage collapses to 8% because a user vector refit from almost no data falls back on globally popular items. The hybrid trades precision for 2.4x broader coverage. Cold start is simulated by truncating 300 real users to three interactions, since every goodbooks user already has at least nineteen.",
   },
   {
+    slug: "pocso-shield",
+    name: "POCSO Shield",
+    domain: "Blockchain / smart contracts",
+    bearing: 225,
+    range: 2400,
+    summary: "On-chain audit trail for anonymous child-safety reports.",
+    lede:
+      "A team build in the CRAFTATHON repository: an anonymous incident-reporting platform where every report hash and every authority action is mirrored on Ethereum, so the audit trail cannot be rewritten after the fact. Authority access is scoped by jurisdiction, and the contract enforces that scoping on-chain rather than leaving it to the interface. My part is the contract layer — POCSORegistry, its test suite, and the ethers integration the backend calls.",
+    metrics: [
+      { label: "Contract tests", value: "23", note: "Hardhat · test/POCSORegistry.test.ts" },
+      {
+        label: "Assert a revert",
+        value: "12 of 23",
+        note: "access control and input validation",
+      },
+      {
+        label: "Contract",
+        value: "POCSORegistry.sol",
+        note: "Solidity ^0.8.20 · Ownable + ReentrancyGuard",
+      },
+      { label: "Network", value: "Ethereum Sepolia", note: "Infura RPC" },
+    ],
+    stack: ["Solidity", "Hardhat", "OpenZeppelin", "ethers.js", "TypeScript"],
+    repoUrl: "https://github.com/Ayush3422/CRAFTATHON",
+    caveat:
+      "This is a team project and the repository is a fork of CODER7657/CRAFTATHON. Two of the seventeen commits are mine, and they are the two that build the contract, its tests and the ethers integration — the FastAPI backend, the AI classification pipeline and the Next.js portal are my teammate's work, and nothing on this card is a claim about them. The contract is exercised against a local Hardhat chain and deployed to a testnet; it has not been audited.",
+  },
+  {
     slug: "vortifi",
     name: "VortiFi",
     domain: "Blockchain",
@@ -124,4 +176,44 @@ export const projects: Project[] = [
     caveat:
       "The Kyber-1024 key exchange is simulated, not a production implementation, and this project is educational. It demonstrates the shape of a lattice-based KEM and where it sits in a messaging protocol — it does not provide real post-quantum security.",
   },
+  {
+    slug: "smart-bus-tracker",
+    name: "Smart Bus Tracker",
+    domain: "Applied ML / transit",
+    // In the applied-ML arc with the other two, and clear of QuantumChat: at
+    // this range both blips sit almost on the origin, and at 330 their labels
+    // overlapped. See the separation test in tests/unit/data.test.ts.
+    bearing: 50,
+    range: 800,
+    summary: "Ridership prediction over a GTFS feed, with a flaw its own tests record.",
+    lede:
+      "Real-time bus tracking with a CatBoost ridership model over a GTFS feed, behind a Flask API and a React map. It is the shallowest contact here on purpose: the evidence for it is a single recorded test run, and that run contains a result the project has not yet explained.",
+    metrics: [
+      { label: "Backend tests", value: "6 of 6", note: "recorded run, 2025-09-17" },
+      { label: "Model", value: "CatBoost", note: "11 features" },
+      { label: "Feed", value: "654 buses", note: "29.8 mean passengers" },
+      { label: "Response time", value: "2.12 s", note: "model performance scenario" },
+    ],
+    stack: ["Python", "CatBoost", "Flask", "React", "GTFS"],
+    repoUrl: "https://github.com/Ayush3422/smart_bus_tracker",
+    caveat:
+      "The recorded run returns the same prediction for all three routes it tests — 13.25 mean and 123.17 peak for RT001, RT002 and RT003 alike — and logs a consistency range of zero. Route identity is not moving the model, so those per-route numbers should not be read as per-route forecasts until that is chased down. It is also two commits of work from a single day, and unlike every other contact here it is not deployed anywhere.",
+  },
 ];
+
+/**
+ * How many contacts are plotted. Exported because four separate places used to
+ * state it as a literal — the hero, the dive plan, the ranking note and the
+ * sign-off — and adding a sixth project left all four saying five.
+ */
+export const projectCount = projects.length;
+
+/**
+ * The same number as a word, capitalised — both places it appears in prose
+ * begin a sentence. Falls back to the numeral past ten, which is a count this
+ * page is unlikely to reach and would read badly as a word if it did.
+ */
+export const projectCountWord =
+  ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"][
+    projectCount
+  ] ?? String(projectCount);

@@ -1,16 +1,26 @@
 import { describe, it, expect } from "vitest";
 import { MAX_DEPTH } from "@/lib/depth";
+import { contactToXY } from "@/lib/sonar";
 import { projects } from "@/data/projects";
 import { skills } from "@/data/skills";
 import { profile } from "@/data/profile";
 
 describe("projects", () => {
-  it("plots exactly the five agreed contacts", () => {
+  /*
+   * A deliberate lock on the roster, not a restatement of the array. Contacts
+   * are added here only after the repository has been read and the card's
+   * figures traced to something a reader can check, so a new slug arriving
+   * without this list changing means that vetting was skipped.
+   */
+  it("plots exactly the agreed contacts", () => {
     expect(projects.map((p) => p.slug).sort()).toEqual([
       "booksense",
       "energy-forecasting",
       "nostro",
+      "pocso-shield",
       "quantumchat",
+      "revisehub",
+      "smart-bus-tracker",
       "vortifi",
     ]);
   });
@@ -27,6 +37,35 @@ describe("projects", () => {
       expect(p.bearing).toBeLessThan(360);
       expect(p.range).toBeGreaterThan(0);
       expect(p.range).toBeLessThanOrEqual(MAX_DEPTH);
+    }
+  });
+
+  /*
+   * Distinct bearings are not sufficient on their own. Two shallow contacts sit
+   * almost on the origin whatever their bearing, and the scope anchors a label
+   * to whichever side of centre its blip falls on — so two blips on the same
+   * side at a similar height print their names on top of each other. That is
+   * how Smart Bus Tracker first landed, overlapping QuantumChat at 330°.
+   */
+  it("keeps same-side labels far enough apart vertically to stay legible", () => {
+    const plotted = projects.map((p) => ({
+      slug: p.slug,
+      ...contactToXY(p.bearing, p.range, 50),
+    }));
+
+    for (let i = 0; i < plotted.length; i++) {
+      for (let j = i + 1; j < plotted.length; j++) {
+        const a = plotted[i];
+        const b = plotted[j];
+        const sameSide = a.x < 0 === b.x < 0;
+        if (!sameSide) continue;
+        // In percent of the scope's box. The labels are 10px on a scope a few
+        // hundred pixels across, so three percent clears a line of type.
+        expect(
+          Math.abs(a.y - b.y),
+          `${a.slug} and ${b.slug} label on the same side at the same height`,
+        ).toBeGreaterThanOrEqual(3);
+      }
     }
   });
 

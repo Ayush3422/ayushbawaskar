@@ -1,4 +1,5 @@
 import type { Profile } from "./types";
+import { projectCount } from "./projects";
 
 export const profile: Profile = {
   name: "Ayush Bawaskar",
@@ -61,7 +62,11 @@ export const headlineStats: {
 }[] = [
   { value: "0.9937", label: "Held-out precision", note: "NOSTRO, 9 of 30 cycles withheld", signal: true },
   { value: "0.81%", label: "Forecast MAPE", note: "vs 6.93% naive baseline" },
-  { value: "5", label: "Contacts plotted", note: "ranked by rigour, not recency" },
+  {
+    value: String(projectCount),
+    label: "Contacts plotted",
+    note: "ranked by rigour, not recency",
+  },
   { value: "16", label: "Public repositories", note: "github.com/Ayush3422" },
 ];
 

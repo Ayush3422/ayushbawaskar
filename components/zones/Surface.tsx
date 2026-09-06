@@ -1,12 +1,13 @@
 import { ZONES } from "@/lib/depth";
 import { profile, headlineStats } from "@/data/profile";
+import { projectCountWord } from "@/data/projects";
 import { Label, Stat } from "@/components/ui/primitives";
 
 /** What waits at each depth. Doubles as the table of contents. */
 const DIVE_PLAN: Record<string, string> = {
   surface: "You are here",
   sunlight: "Who you are reading",
-  twilight: "Five contacts, ranked by rigour",
+  twilight: `${projectCountWord} contacts, ranked by rigour`,
   midnight: "Competence plotted against evidence",
   abyssal: "The log, and the rules it taught",
   hadal: "Contact, and how this was built",

@@ -43,9 +43,21 @@ export const skills: Skill[] = [
     evidenceSlug: "booksense",
     evidenceLabel: "BookSense AI",
   },
-  { name: "React", depth: 1900, evidenceSlug: "vortifi", evidenceLabel: "VortiFi" },
-  { name: "Solidity", depth: 1900, evidenceSlug: "vortifi", evidenceLabel: "VortiFi" },
-  { name: "Hardhat / ethers.js", depth: 1900, evidenceSlug: "vortifi", evidenceLabel: "VortiFi" },
+  { name: "React", depth: 6200, evidenceSlug: "revisehub", evidenceLabel: "ReviseHub" },
+  /*
+   * Both moved from VortiFi to POCSO Shield. The rule for this line is that a
+   * skill is plotted at the depth of the deepest project that evidences it,
+   * and the POCSO registry is the better-evidenced of the two contracts — 23
+   * tests, twelve of them asserting a revert, against VortiFi's none. Leaving
+   * them at 1,900 would have contradicted the line's own stated rule.
+   */
+  { name: "Solidity", depth: 2400, evidenceSlug: "pocso-shield", evidenceLabel: "POCSO Shield" },
+  {
+    name: "Hardhat / ethers.js",
+    depth: 2400,
+    evidenceSlug: "pocso-shield",
+    evidenceLabel: "POCSO Shield",
+  },
   {
     name: "Node.js / Express",
     depth: 1200,
@@ -59,8 +71,21 @@ export const skills: Skill[] = [
     evidenceSlug: "quantumchat",
     evidenceLabel: "QuantumChat",
   },
-  { name: "TypeScript", depth: 600, evidenceSlug: "abyss", evidenceLabel: "This site" },
-  { name: "Next.js / Tailwind", depth: 600, evidenceSlug: "abyss", evidenceLabel: "This site" },
+  /*
+   * Both were plotted against this site at 600 m, which was true only while it
+   * was the deepest thing here written in them. ReviseHub is a larger TypeScript
+   * and Next.js codebase with 68 tests behind it, so by this line's own rule —
+   * a skill sits at the depth of the deepest project evidencing it — that is
+   * where they belong. WebGL2 stays with the site, which is still the only
+   * thing here that evidences it.
+   */
+  { name: "TypeScript", depth: 6200, evidenceSlug: "revisehub", evidenceLabel: "ReviseHub" },
+  {
+    name: "Next.js / Tailwind",
+    depth: 6200,
+    evidenceSlug: "revisehub",
+    evidenceLabel: "ReviseHub",
+  },
   { name: "WebGL2 / GLSL", depth: 600, evidenceSlug: "abyss", evidenceLabel: "This site" },
 ];
 

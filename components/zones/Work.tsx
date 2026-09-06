@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { projects } from "@/data/projects";
+import { projects, projectCountWord } from "@/data/projects";
 import { SonarScope } from "@/components/sonar/SonarScope";
 import { ContactCard } from "@/components/sonar/ContactCard";
 import { Label, Panel, PixelRule, Stamp } from "@/components/ui/primitives";
@@ -84,7 +84,8 @@ export function Work() {
 
         <Panel label="How this is ranked">
           <p className="font-mono text-sm leading-[1.85] text-muted-foreground">
-            Five builds, ordered by how much of the work survives questioning
+            {projectCountWord} builds, ordered by how much of the work
+            survives questioning
             rather than by how recent it is. Range is that ranking expressed as
             depth, on the same scale as the page you are descending — so a
             contact further out is one that took more to get right, not one that

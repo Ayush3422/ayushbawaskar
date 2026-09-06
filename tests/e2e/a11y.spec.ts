@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { projects } from "@/data/projects";
 
 test("reduced motion does not break the page", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
@@ -8,7 +9,7 @@ test("reduced motion does not break the page", async ({ browser }) => {
 
   await page.goto("/");
   await expect(page.locator("h1")).toBeVisible();
-  await expect(page.locator("[data-contact]")).toHaveCount(5);
+  await expect(page.locator("[data-contact]")).toHaveCount(projects.length);
   expect(errors).toEqual([]);
 
   await context.close();

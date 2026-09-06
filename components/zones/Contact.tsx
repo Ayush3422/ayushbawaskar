@@ -1,4 +1,5 @@
 import { profile, colophon } from "@/data/profile";
+import { projectCount } from "@/data/projects";
 import { Label, Panel, PixelRule, SpecSheet, Stamp } from "@/components/ui/primitives";
 import { iconFor } from "@/components/ui/icons";
 import { RepoManifest } from "@/components/manifest/RepoManifest";
@@ -30,7 +31,7 @@ export function Contact() {
             {[
               { v: "11,034", l: "Metres descended" },
               { v: "6", l: "Zones traversed" },
-              { v: "5", l: "Contacts inspected" },
+              { v: String(projectCount), l: "Contacts inspected" },
               { v: "1,104", l: "Bar at the floor" },
             ].map((s) => (
               <div key={s.l}>
