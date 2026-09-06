@@ -85,20 +85,31 @@ export function Landing() {
             </span>
 
             {/* The plate. Registration crosses sit outside the rule, as on the
-                counter in the band below, so the two read as one instrument. */}
+                counter in the band below, so the two read as one instrument.
+
+                The scale is tuned tighter than it looks like it needs to be:
+                the line does not wrap, and "| AYUSH BAWASKAR |" is four
+                characters longer than the wordmark it replaced. Measured: it
+                ran off a 390px screen at the old 2rem floor, and still ran
+                three pixels past a 320px one at 1.35rem. */}
             <div className="relative">
               <Crosses />
               <p
-                className="border-y-2 px-6 py-4 font-display text-[clamp(2rem,7vw,4.5rem)] leading-none tracking-[0.14em] whitespace-nowrap"
+                className="border-y-2 px-3 py-4 font-display text-[clamp(1.15rem,5vw,3.5rem)] leading-none tracking-[0.12em] whitespace-nowrap sm:px-6"
                 style={{
                   borderColor: "color-mix(in srgb, var(--signal) 40%, transparent)",
                 }}
               >
-                AYUSH
-                <span style={{ color: "var(--signal)" }}>{" // "}</span>
-                ABYSS
+                <span style={{ color: "var(--signal)" }}>|</span> AYUSH BAWASKAR{" "}
+                <span style={{ color: "var(--signal)" }}>|</span>
               </p>
             </div>
+
+            {/* Backed by the education entry in the profile: BTech CSE (AI-ML),
+                New LJ Institute, from August 2024. */}
+            <p className="font-mono text-[11px] tracking-[0.28em] text-foreground/75 uppercase sm:text-xs">
+              An CSE (AI-ML) student
+            </p>
 
             <p className="max-w-lg font-serif text-lg text-foreground/75 md:text-xl">
               {profile.heroLine}

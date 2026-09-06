@@ -45,7 +45,7 @@ test("the band is a band inside the gate, not the gate itself", async ({
 
   const bandBox = await band(page).boundingBox();
   const wordmark = await page
-    .locator("#landing p", { hasText: "ABYSS" })
+    .locator("#landing p", { hasText: "AYUSH BAWASKAR" })
     .first()
     .boundingBox();
   expect(bandBox).not.toBeNull();
